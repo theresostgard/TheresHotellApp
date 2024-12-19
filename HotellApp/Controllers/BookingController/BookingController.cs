@@ -7,72 +7,92 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HotellApp.Services.BookingServices;
+using HotellApp.Controllers.GuestController;
 
 namespace HotellApp.Controllers.BookingController
 {
     public class BookingController : IBookingController
     {
         private readonly IBookingService _bookingService;
+        private readonly IGuestController _guestController;
 
-        public BookingController(IBookingService bookingService)
+        public BookingController(IBookingService bookingService, IGuestController guestController)
         {
             _bookingService = bookingService;
+            _guestController = guestController;
         }
 
         public void CreateBookingController()
         {
-            Console.WriteLine("Ange bokningsdetaljer:");
+            var (guestType, guestId) = _guestController.SelectCustomerType();
 
-            var booking = new Booking
+            if (guestId == null)
             {
-                //här behöver kundens namn hämtas på något sätt
-                ArrivalDate = AnsiConsole.Ask<DateTime>("Ankomstdatum (yyyy-MM-dd):"),
-                DepartureDate = AnsiConsole.Ask<DateTime>("Avresedatum (yyyy-MM-dd):"),
-                RoomType = AnsiConsole.Ask<TypeOfRoom>("Rumstyp: (enkel(1), dubbel(2)"),
-                AmountOfGuests = AnsiConsole.Ask<sbyte>("Antal gäster: "),
-                AmountOfRooms = AnsiConsole.Ask<sbyte>("Antal rum:")
+                Console.WriteLine("Kundval kunde inte genomföras. Avslutar bokningen.");
+                return; // If no valid customer was selected, exit the method.
+            }
 
-            };
+            Console.WriteLine("Ange bokningsdetaljer:");
+            if (guestId.HasValue)
+            {
+                var booking = new Booking
+                {
+                    //här behöver kundens namn hämtas på något sätt
+                    GuestId = guestId.Value,
+                    ArrivalDate = AnsiConsole.Ask<DateTime>("Ankomstdatum (yyyy-MM-dd):"),
+                    DepartureDate = AnsiConsole.Ask<DateTime>("Avresedatum (yyyy-MM-dd):"),
+                    RoomType = AnsiConsole.Ask<TypeOfRoom>("Rumstyp: (enkel(1), dubbel(2)"),
+                    AmountOfGuests = AnsiConsole.Ask<sbyte>("Antal gäster: "),
+                    AmountOfRooms = AnsiConsole.Ask<sbyte>("Antal rum:")
 
-            _bookingService.CreateBooking(booking);
-            AnsiConsole.WriteLine("Ny bokning skapad.");
+                };
+                _bookingService.CreateBooking(booking);
+                AnsiConsole.WriteLine("Ny bokning skapad.");
+            }
+            else
+            {
+                Console.WriteLine("Ogiltigt kundnummer.");
+            }
+            
+            
         }
 
         public void ReadAllBookingsController()
         {
             var bookings = _bookingService.GetAllBookings();
-            //if (bookings.Count == 0)
-            //{
-            //    Console.WriteLine("Inga bokningar hittades.");
-            //}
-            //else
-            //{
-            //    foreach (var booking in bookings)
-            //    {
-            //        if (booking.Customer != null)
-            //        {
+            if (bookings.Count == 0)
+            {
+                Console.WriteLine("Inga bokningar hittades.");
+            }
+            else
+            {
+                foreach (var booking in bookings)
+                {
+                    if (booking.BookingId != null)
+                    {
 
 
-            //            Console.WriteLine("_________________________________________________________________\n");
-            //            Console.WriteLine($"Bokningsnummer: {booking.BookingId}\n" +
-            //                $"Kundens namn: {booking.FirstName}, {booking.LastName}\n " +
-            //                $"Ankomstdatum: {booking.ArrivalDate}\n" +
-            //                $"Avresedatum: {booking.DepartureDate}\n" +
-            //                $"Rumstyp: {booking.RoomType}\n" +
-            //                $"Antal gäster: {booking.AmountOfGuests}, antal rum: {booking.AmountOfRooms}\n" +
-            //                $"Kontaktuppgift: {booking.PhoneNumber}");
-            //            Console.WriteLine("\n_________________________________________________________________\n");
-            //        }
-            //        else
-            //        {
-            //            Console.WriteLine($"Bokningsnummer {booking.BookingId} har ingen kopplad kund.");
-            //        }
-            //    }
-            //}
+                        Console.WriteLine("_________________________________________________________________\n");
+                        Console.WriteLine($"Bokningsnummer: {booking.BookingId}\n" +
+                            //$"Kundens namn: {booking.FirstName}, {booking.LastName}\n " +
+                            $"Ankomstdatum: {booking.ArrivalDate}\n" +
+                            $"Avresedatum: {booking.DepartureDate}\n" +
+                            $"Rumstyp: {booking.RoomType}\n" +
+                            $"Antal gäster: {booking.AmountOfGuests}, antal rum: {booking.AmountOfRooms}\n"); //+
+                           // $"Kontaktuppgift: {booking.PhoneNumber}");
+                        Console.WriteLine("\n_________________________________________________________________\n");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Bokningsnummer {booking.BookingId} har ingen kopplad kund.");
+                    }
+                }
+            }
         }
 
         public void ReadBookingController()
         {
+            ReadAllBookingsController();
             Console.WriteLine("Ska man kunna välja ett specifikt bokningsnr för att visa just den bokningen?");     //StudentDB har exempel jag kan modifiera
         }
 
@@ -98,5 +118,6 @@ namespace HotellApp.Controllers.BookingController
             var id = AnsiConsole.Ask<int>("Ange bokningsnummer för den bokning du vill radera:");
             _bookingService.DeleteBooking(id);
         }
+
     }
 }

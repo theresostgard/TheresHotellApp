@@ -16,64 +16,71 @@ namespace HotellApp.Services.GuestServices
 
         public GuestService(ApplicationDbContext dbContext)
         {
-            _dbContext = dbContext;
+            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
 
         public void CreateGuest(Guest guest)
         {
             _dbContext.Guest.Add(guest);
+            _dbContext.SaveChanges();
         }
 
-        public void ReadGuest(int guestId)
+        public Guest ReadGuest(int guestId)
         {
-            bool IsContinuingReading = true;
 
-            while (IsContinuingReading)
-            {
-                Console.Clear();
-                var allCustomers = _dbContext.Guest;
+            var guestbyId = _dbContext.Guest
+                .FirstOrDefault(g => g.GuestId == guestId);
 
-                AnsiConsole.WriteLine("Alla kunder:");
-                foreach (var items in _dbContext.Guest)
-                {
-                    AnsiConsole.WriteLine($"ID: {items.GuestId}\nFörnamn: {items.FirstName}\nEfternamn: {items.LastName}\n");
+            return guestbyId;
+            //bool IsContinuingReading = true;
 
-                }
-                Console.ReadKey();
-                var customerId = AnsiConsole.Prompt(
-                    new TextPrompt<int>("Ange kundens ID: "));
+            //while (IsContinuingReading)
+            //{
+            //    Console.Clear();
+            //    var allCustomers = _dbContext.Guest;
 
-                var customer = _dbContext.Guest.FirstOrDefault(c => c.GuestId == customerId);
+            //    AnsiConsole.WriteLine("Alla kunder:");
+            //    foreach (var items in _dbContext.Guest)
+            //    {
+            //        AnsiConsole.WriteLine($"ID: {items.GuestId}\nFörnamn: {items.FirstName}\nEfternamn: {items.LastName}\n");
 
-                if (customer != null)
-                {
-                    AnsiConsole.WriteLine($"Kund funnen:\n" +
-                        $"ID: {customer.GuestId}\n" +
-                        $"Förnamn: {customer.FirstName}\n" +
-                        $"Efternamn: {customer.LastName}\n" +
-                        $"Telefonnummer: {customer.PhoneNumber}\n" +
-                        $"E-mailadress: {customer.EmailAdress}\n");
-                }
-                else
-                {
-                    AnsiConsole.WriteLine("Kunden kunde inte hittas.");
+            //    }
+            //    Console.ReadKey();
+            //    var customerId = AnsiConsole.Prompt(
+            //        new TextPrompt<int>("Ange kundens ID: "));
 
-                    var IsCreatingNewCustomer = AnsiConsole.Prompt(
-                    new TextPrompt<bool>("Vill du skapa en ny kund? (true för ja, false för nej)"));
-                    if (IsCreatingNewCustomer == true)
-                    {
-                        //CreateGuest();
-                    }
+            //    var customer = _dbContext.Guest.FirstOrDefault(c => c.GuestId == customerId);
 
-                }
-                var continueOption = AnsiConsole.Prompt(
-                new TextPrompt<bool>("Vill du läsa en annan kund? (true för ja, false för nej)"));
+            //    if (customer != null)
+            //    {
+            //        AnsiConsole.WriteLine($"Kund funnen:\n" +
+            //            $"ID: {customer.GuestId}\n" +
+            //            $"Förnamn: {customer.FirstName}\n" +
+            //            $"Efternamn: {customer.LastName}\n" +
+            //            $"Telefonnummer: {customer.PhoneNumber}\n" +
+            //            $"E-mailadress: {customer.EmailAdress}\n");
+            //    }
+            //    else
+            //    {
+            //        AnsiConsole.WriteLine("Kunden kunde inte hittas.");
 
-                if (!continueOption)
-                {
-                    IsContinuingReading = false;  // Stäng av loopen om användaren inte vill fortsätta
-                }
-            }
+            //        var IsCreatingNewCustomer = AnsiConsole.Prompt(
+            //        new TextPrompt<bool>("Vill du skapa en ny kund? (true för ja, false för nej)"));
+            //        if (IsCreatingNewCustomer == true)
+            //        {
+            //            //CreateGuest();
+            //        }
+
+            //    }
+            //    var continueOption = AnsiConsole.Prompt(
+            //    new TextPrompt<bool>("Vill du läsa en annan kund? (true för ja, false för nej)"));
+
+            //    if (!continueOption)
+            //    {
+            //        IsContinuingReading = false;  // Stäng av loopen om användaren inte vill fortsätta
+            //    }
+            //}
+            //return _dbContext.Guest;
         }
 
         public void UpdateGuest(int guestId, Guest guest)
@@ -105,23 +112,41 @@ namespace HotellApp.Services.GuestServices
             {
                 AnsiConsole.WriteLine("Kunden kunde inte hittas.");
             }
+
+            _dbContext.SaveChanges();
         }
         public void DeleteGuest(int guestId)
         {
             var customerId = AnsiConsole.Prompt(
-            new TextPrompt<int>("Ange kundens ID att ta bort: "));
+            new TextPrompt<int>("Ange gästId för den gäst du vill ta bort: "));
 
             var customer = _dbContext.Guest.FirstOrDefault(c => c.GuestId == customerId);
 
             if (customer != null)
             {
                 _dbContext.Guest.Remove(customer); // Ta bort kunden från listan
-                AnsiConsole.WriteLine("Kunden har tagits bort.");
+                AnsiConsole.WriteLine("Gästen har tagits bort.");
             }
             else
             {
-                AnsiConsole.WriteLine("Kunden kunde inte hittas.");
+                AnsiConsole.WriteLine("Ingen gäst med det Id:t kunde inte hittas.");
             }
+        }
+
+        public int GetLatestGuestId()
+        {
+            var latestGuest = _dbContext.Guest
+                .OrderByDescending(g => g.GuestId)
+                .FirstOrDefault();
+
+            if (latestGuest == null)
+            {
+                Console.WriteLine("Inga gäster finns i databasen.");
+                return 0;
+            }
+
+            return latestGuest.GuestId;
+
         }
     }
 }

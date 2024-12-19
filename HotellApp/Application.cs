@@ -37,8 +37,7 @@ namespace HotellApp
             using (var dbContext = new ApplicationDbContext(options.Options))
             {
                 var dataInitiaizer = new DataInitializer();
-                dataInitiaizer.MigrateAndSeed(dbContext);
-                
+                dataInitiaizer.MigrateAndSeed(dbContext); 
             }
 
             

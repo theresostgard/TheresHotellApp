@@ -8,20 +8,23 @@ using System.Threading.Tasks;
 
 namespace HotellApp.Services.MenuServices.GuestMenu
 {
-    public class GuestMenu(IGuestController guestController) : IGuestMenu
+    public class GuestMenu : IGuestMenu
     {
         private readonly IGuestController _guestController;
-        //private readonly IServiceFactory _serviceFactory;
-        //private readonly MenuManager _menuManager;
+      
 
+        public GuestMenu(IGuestController guestController)
+        {
+            _guestController = guestController;
+        }
 
         private readonly string[] _menuItems =
         {
-                "Skapa kund",
-                "Visa en kund",
-                "Visa alla kunder",
-                "Uppdatera kund",
-                "Ta bort kund",
+                "Skapa ny gäst",
+                "Visa en gäst",
+                "Visa alla gäster",
+                "Uppdatera gäst",
+                "Ta bort gäst",
                 "Tillbaka till huvudmenyn"
         };
 
@@ -30,36 +33,36 @@ namespace HotellApp.Services.MenuServices.GuestMenu
         public void ShowCustomerOptions()
         {
             int selectedIndex = 0;
-            MenuRenderer.ShowMenu(_menuItems, ref selectedIndex, "Kundmeny", HandleMenuSelection);
+            MenuRenderer.ShowMenu(_menuItems, ref selectedIndex, "Gästmeny", HandleMenuSelection);
         }
 
         private void HandleMenuSelection(int selectedIndex)
         {
-            //var customerService = _serviceFactory.GetService<ICustomerService>();
+          
             string selectedItem = _menuItems[selectedIndex];
             switch (selectedItem)
             {
-                case "Skapa kund":
+                case "Skapa ny gäst":
                     Console.Clear();
                     _guestController.CreateGuestController();
                     Console.ReadKey();
                     break;
-                case "Visa en kund":
+                case "Visa en gäst":
                     Console.Clear();
                     _guestController.ReadGuestController();
                     Console.ReadKey();
                     break;
-                case "Visa alla kunder":
+                case "Visa alla gäster":
                     Console.Clear();
                     _guestController.ReadAllGuestsController();
                     Console.ReadKey();
                     break;
-                case "Uppdatera kund":
+                case "Uppdatera gäst":
                     Console.Clear();
                     _guestController.UpdateGuestController();
                     Console.ReadKey();
                     break;
-                case "Ta bort kund":
+                case "Ta bort gäst":
                     Console.Clear();
                     _guestController.DeleteGuestController();
                     Console.ReadKey();
