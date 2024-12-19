@@ -20,8 +20,10 @@ namespace HotellApp.Services.BookingServices
 
         public void CreateBooking(Booking booking)
         {
-            _dbContext.Booking.Add(booking);
-            _dbContext.SaveChanges();
+            
+                _dbContext.Booking.Add(booking);
+                _dbContext.SaveChanges();
+            
 
         }
 

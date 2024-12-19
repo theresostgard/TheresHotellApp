@@ -17,11 +17,11 @@ namespace HotellApp.Controllers.GuestController
 
         public GuestController(IGuestService guestService)
         {
-            _guestService = guestService ?? throw new ArgumentNullException(nameof(guestService)); 
+            _guestService = guestService; //?? throw new ArgumentNullException(nameof(guestService)); 
         }
         public void CreateGuestController()
         {
-            Console.WriteLine("Ange den nya gästens uppgifter: ");
+            
 
             var guest = new Guest
             {
@@ -32,14 +32,14 @@ namespace HotellApp.Controllers.GuestController
 
             };
 
-            AnsiConsole.WriteLine($"Ny kund skapad med följande information:\n" +
-               $"Förnamn: {guest.FirstName}\n" +
-               $"Efternamn: {guest.LastName}\n" +
-               $"Telefonnummer: {guest.PhoneNumber}\n" +
-               $"E-mailadress: {guest.EmailAdress}\n");
+           var createdGuest = _guestService.CreateGuest(guest);
 
-            _guestService.CreateGuest(guest);
-            
+            AnsiConsole.WriteLine($"Ny gäst skapad med följande information:\n" +
+              $"GästId: {createdGuest.GuestId}\n" +
+              $"Förnamn: {createdGuest.FirstName}\n" +
+              $"Efternamn: {guest.LastName}\n" +
+              $"Telefonnummer: {guest.PhoneNumber}\n" +
+              $"E-mailadress: {guest.EmailAdress}\n");
         }
 
         public void DeleteGuestController()
@@ -90,9 +90,10 @@ namespace HotellApp.Controllers.GuestController
 
         public int GetLatestGuestId()
         {
-            Console.WriteLine("Hämtar id för den senast skapade kunden: ");
+            //Console.WriteLine("Hämtar id för den senast skapade kunden: ");
 
             var latestGuest = _guestService.GetLatestGuestId();
+            Console.WriteLine(latestGuest);
             return latestGuest;
         }
 

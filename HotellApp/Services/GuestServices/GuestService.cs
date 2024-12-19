@@ -16,22 +16,26 @@ namespace HotellApp.Services.GuestServices
 
         public GuestService(ApplicationDbContext dbContext)
         {
-            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+            _dbContext = dbContext; // ?? throw new ArgumentNullException(nameof(dbContext));
         }
 
-        public void CreateGuest(Guest guest)
+        public Guest CreateGuest(Guest guest)
         {
-            _dbContext.Guest.Add(guest);
-            _dbContext.SaveChanges();
+            
+                _dbContext.Guest.Add(guest);
+                _dbContext.SaveChanges();
+                return guest;
+            
         }
 
         public Guest ReadGuest(int guestId)
         {
+            
+                var guestbyId = _dbContext.Guest
+                    .FirstOrDefault(g => g.GuestId == guestId);
 
-            var guestbyId = _dbContext.Guest
-                .FirstOrDefault(g => g.GuestId == guestId);
-
-            return guestbyId;
+                return guestbyId;
+            
             //bool IsContinuingReading = true;
 
             //while (IsContinuingReading)
@@ -135,17 +139,19 @@ namespace HotellApp.Services.GuestServices
 
         public int GetLatestGuestId()
         {
-            var latestGuest = _dbContext.Guest
-                .OrderByDescending(g => g.GuestId)
-                .FirstOrDefault();
+           
+                var latestGuest = _dbContext.Guest
+                    .OrderByDescending(g => g.GuestId)
+                    .FirstOrDefault();
 
-            if (latestGuest == null)
-            {
-                Console.WriteLine("Inga gäster finns i databasen.");
-                return 0;
-            }
+                if (latestGuest == null)
+                {
+                    Console.WriteLine("Inga gäster finns i databasen.");
+                    return 0;
+                }
 
-            return latestGuest.GuestId;
+                return latestGuest.GuestId;
+            
 
         }
     }
