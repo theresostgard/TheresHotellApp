@@ -48,9 +48,6 @@ namespace HotellApp
                 mainMenu.ShowMainMenu();  // Visar huvudmenyn
             }
 
-
-
-
         }
     }
 }

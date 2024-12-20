@@ -22,12 +22,15 @@ namespace HotellApp.Models
 
         public int GuestId { get; set; }     //behöver hämtas från customerentiteten eller genereras ny (via detsamma)
 
-        public int RoomId { get; set; }
+        public Guest Guest { get; set; } // En bokning kan ha en gäst
+
+        // Relaterad information för extrasängar
+       
+        public int AmountOfExtraBeds { get; set; } // Hur många extrasängar som önskas
 
         public ICollection<BookingRoom> BookingRooms { get; set; }
 
-        // Navigation property till Guest
-        public Guest Guest { get; set; }  // En bokning
+       
 
     }
 }

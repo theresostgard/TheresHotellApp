@@ -5,7 +5,7 @@ namespace HotellApp.Models
     public class Room
     {
 
-        public int RoomID { get; set; }
+        public int RoomId { get; set; }
         public TypeOfRoom RoomType { get; set; }
         public int RoomSize { get; set; }
         public bool? IsExtraBedAllowed { get; set; }

@@ -4,10 +4,11 @@ namespace HotellApp.Services.GuestServices
 {
     public interface IGuestService
     {
-        void CreateGuest(Guest guest);
+        Guest CreateGuest(Guest guest);
         Guest ReadGuest(int id);
+        List<Guest> GetAllGuests();
         void UpdateGuest(int id, Guest updatedGuest);
-        void DeleteGuest(int id);
+        string DeleteGuest(int id);
         int GetLatestGuestId();
     }
 }

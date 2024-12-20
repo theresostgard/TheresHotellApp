@@ -26,7 +26,7 @@ namespace HotellApp.Services.MenuServices.MainMenues
         private readonly string[] _mainMenuItems =
         {
             "Bokning",
-             "Kund",
+             "Gäst",
              "Rum",
              "Faktura",
              "Avsluta"
@@ -48,7 +48,7 @@ namespace HotellApp.Services.MenuServices.MainMenues
                     var bookingMenu = _serviceFactory.Get<IBookingMenu>();
                     bookingMenu.ShowBookingOptions();
                     break;
-                case "Kund":
+                case "Gäst":
                     Console.Clear();
                     var customerMenu = _serviceFactory.Get<IGuestMenu>();
                     customerMenu.ShowCustomerOptions();

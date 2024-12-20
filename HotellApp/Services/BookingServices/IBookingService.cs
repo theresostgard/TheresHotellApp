@@ -1,4 +1,5 @@
 ﻿using HotellApp.Models;
+using HotellApp.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,17 @@ namespace HotellApp.Services.BookingServices
 
         Booking ReadBooking(int id);
         void UpdateBooking(int id, Booking updatedBooking);
-        void DeleteBooking(int id);
+        string DeleteBooking(int id);
+
+        public bool TryGetAvailableRoomsForBooking(
+            TypeOfRoom roomType,
+            DateTime arrivalDate,
+            DateTime departureDate,
+            int amountOfRooms,
+            out List<Room> availableRooms);
+
+        void AddRoomsToBooking(List<BookingRoom> bookingRooms);
     }
+
+    
 }
