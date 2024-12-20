@@ -66,7 +66,7 @@ namespace HotellApp.Services.BookingServices
                 booking.AmountOfGuests = updatedBooking.AmountOfGuests;
                 booking.AmountOfRooms = updatedBooking.AmountOfRooms;
 
-                //_dbContext.SaveChanges();
+                _dbContext.SaveChanges();
                 Console.WriteLine($"Bokningen med bokningsnr {bookingId} har uppdaterats!");
             }
             else
@@ -76,19 +76,27 @@ namespace HotellApp.Services.BookingServices
         }
 
         // Tar bort en bokning
-        public void DeleteBooking(int id)
+        public string DeleteBooking(int id)
         {
             var booking = _dbContext.Booking.FirstOrDefault(b => b.BookingId == id);
-            if (booking != null)
+            if (booking == null)
             {
+                return "Bokningen hittades inte.";
+            }
 
-                _dbContext.Booking.Remove(booking);            //set as inactive?
-                Console.WriteLine("Booking deleted successfully!");
-            }
-            else
+            if (booking.ArrivalDate <= DateTime.Now && booking.DepartureDate >= DateTime.Now)
             {
-                Console.WriteLine("Booking not found.");
+                return "Bokningen kan inte raderas eftersom den redan pågår eller har avslutats.";
             }
+
+            if (booking.ArrivalDate > DateTime.Now)
+            {
+                _dbContext.Booking.Remove(booking);
+                _dbContext.SaveChanges();
+                return "Bokningen har raderats framgångsrikt!";
+            }
+
+            return "Bokningen kan inte raderas eftersom den redan är avslutad.";
         }
         public bool TryGetAvailableRoomsForBooking(TypeOfRoom roomType, DateTime arrivalDate, DateTime departureDate, int amountOfRooms, out List<Room> availableRooms)
         {

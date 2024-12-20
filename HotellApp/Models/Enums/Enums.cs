@@ -23,8 +23,8 @@ namespace HotellApp.Models.Enums
 
     public enum GuestType
     {
-        NewCustomer = 1,
-        ExistingCustomer = 2
+        NewGuest = 1,
+        ExistingGuest = 2
     }
 
     public enum AmountOfExtraBedsAllowedInRoom
@@ -32,5 +32,11 @@ namespace HotellApp.Models.Enums
         None = 0,
         One = 1,
         Two = 2
+    }
+
+    public enum GuestStatus
+    {
+        Active = 1,
+        Inactive = 0
     }
 }

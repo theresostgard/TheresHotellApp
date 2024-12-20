@@ -160,7 +160,9 @@ namespace HotellApp.Controllers.BookingController
                                       $"Antal rum: {booking.AmountOfRooms}\n" +
                                       $"Antal gäster: {booking.AmountOfGuests}");
 
-                    if(booking.BookingRooms == null || !booking.BookingRooms.Any())
+                    bool noRoomConnectedToBooking = booking.BookingRooms == null || !booking.BookingRooms.Any();
+
+                    if (noRoomConnectedToBooking)
                     {
                         Console.WriteLine("Inga rum kopplade till denna bokning.");
                         continue;
@@ -173,7 +175,7 @@ namespace HotellApp.Controllers.BookingController
                             Console.WriteLine($"Rum ID: {room.RoomId}, Rumstyp: {room.RoomType}, Storlek: {room.RoomSize} kvm\n" +
                                 $"____________________________________________________");
                         }
-                        else
+                        else if(!noRoomConnectedToBooking)
                         {
                             Console.WriteLine("Rum kopplat till bokningen saknas.");
                         }
@@ -213,8 +215,21 @@ namespace HotellApp.Controllers.BookingController
 
         public void DeleteBookingController()
         {
+            //visa lista med bokningar och datum så man vet vad man kan välja 
             var id = AnsiConsole.Ask<int>("Ange bokningsnummer för den bokning du vill radera:");
-            _bookingService.DeleteBooking(id);
+
+            var confirm = AnsiConsole.Confirm("Är du säker på att du vill radera bokningen?");
+            if (!confirm)
+            {
+                Console.WriteLine("Radering avbruten.");
+                return;
+            }
+
+            // Kalla på servicen för att försöka ta bort bokningen
+            var result = _bookingService.DeleteBooking(id);
+
+            // Visa resultatet till användaren
+            AnsiConsole.MarkupLine($"[yellow]{result}[/]");
         }
 
     }

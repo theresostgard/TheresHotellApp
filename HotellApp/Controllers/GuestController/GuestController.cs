@@ -21,7 +21,7 @@ namespace HotellApp.Controllers.GuestController
         }
         public void CreateGuestController()
         {
-
+            AnsiConsole.WriteLine("Registrera ny gäst:\n\n");
 
             var guest = new Guest
             {
@@ -29,6 +29,7 @@ namespace HotellApp.Controllers.GuestController
                 LastName = AnsiConsole.Ask<string>("Efternamn"),
                 PhoneNumber = ValidatePhoneNumber(),
                 EmailAdress = ValidateEmailAddress(),
+                GuestStatus = GuestStatus.Active
 
             };
 
@@ -44,12 +45,39 @@ namespace HotellApp.Controllers.GuestController
 
         public void DeleteGuestController()
         {
-            throw new NotImplementedException();
+            var guestId = AnsiConsole.Prompt(
+                new TextPrompt<int>("Ange GästId för den kund du vill radera: "));
+
+            var confirm = AnsiConsole.Confirm("Är du säker på att du vill radera gästen?");
+            if (!confirm)
+            {
+                Console.WriteLine("Radering avbruten.");
+                return;
+            }
+
+            var deleteGuestIfPossible = _guestService.DeleteGuest(guestId);
+
+            AnsiConsole.MarkupLine($"[red]{deleteGuestIfPossible}[/]");
         }
 
         public void ReadAllGuestsController()
         {
-            Console.WriteLine("Lista med alla registrerade gäster");
+            var guests = _guestService.GetAllGuests();
+
+            if (guests != null && guests.Any())
+            {
+                foreach (var guest in guests)
+                {
+                    Console.WriteLine($"GästId: {guest.GuestId}\n" +
+                        $"Förnamn: {guest.FirstName}\n" +
+                        $"Efternamn: {guest.LastName}\n" +
+                        $"_______________________________\n");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Inga gäster finns registrerade.");
+            }
         }
 
         public void ReadGuestController()
@@ -62,18 +90,21 @@ namespace HotellApp.Controllers.GuestController
             if (guest != null)
             {
                 AnsiConsole.WriteLine($"Gäst funnen:\n" +
-                    $"ID: {guest.GuestId}\n" +
+                    $"GästId: {guest.GuestId}\n" +
                     $"Förnamn: {guest.FirstName}\n" +
                     $"Efternamn: {guest.LastName}\n");
             }
             else
             {
-                AnsiConsole.WriteLine("Gästen kunde inte hittas.");
+                AnsiConsole.WriteLine("Gästen kunde inte hittas.\n");
 
                 var IsCreatingNewCustomer = AnsiConsole.Prompt(
-                new TextPrompt<bool>("Vill du skapa en ny gäst? (true för ja, false för nej)"));
-                if (IsCreatingNewCustomer == true)
+                new SelectionPrompt<string>()
+                .Title("Vill du skapa en ny gäst?")
+                .AddChoices("Ja", "Nej"));
+                if (IsCreatingNewCustomer.Trim() == "Ja")
                 {
+                    Console.Clear();
                     CreateGuestController();
                 }
 
@@ -85,7 +116,14 @@ namespace HotellApp.Controllers.GuestController
 
         public void UpdateGuestController()
         {
-            Console.WriteLine("Häe ska man kunna uppdatera en gäst");
+            var guestId = AnsiConsole.Ask<int>("Ange gästId för den gäst du vill uppdatera:");
+
+            var currentGuestData = _guestService.ReadGuest(guestId);
+
+            var updatedGuest = GetGuestDetailsFromUser(currentGuestData);
+
+            _guestService.UpdateGuest(guestId, updatedGuest);
+            AnsiConsole.WriteLine($"Gäst med gästId {guestId} har uppdaterats.");
         }
 
         public int GetLatestGuestId()
@@ -104,26 +142,42 @@ namespace HotellApp.Controllers.GuestController
           
             while (true)
             {
+                
+                
                 Console.WriteLine("Är det en ny (1) eller befintlig (2) kund?");
-                var guestInput = Console.ReadLine();
+                guestType = AnsiConsole.Prompt(
+                    new SelectionPrompt<GuestType>()
+                    .Title("Är det en ny eller befintlig gäst? ")
+                    .AddChoices(GuestType.NewGuest, GuestType.ExistingGuest));
 
-                if (Enum.TryParse(guestInput, out guestType) && Enum.IsDefined(typeof(GuestType), guestType))
+                //if (Enum.TryParse(guestInput, out guestType) && Enum.IsDefined(typeof(GuestType), guestType))
+                //{
+                //    break; 
+                //}
+                //else
+                //{
+                //    Console.WriteLine("Ogiltigt val. Försök igen.");
+                //}
+
+                if (guestType == GuestType.NewGuest || guestType == GuestType.ExistingGuest)
                 {
-                    break; 
+                    break;
                 }
                 else
                 {
-                    Console.WriteLine("Ogiltigt val. Försök igen.");
+                    AnsiConsole.Markup("[red]Ogiltigt val. Försök igen.[/]");
                 }
             }
 
-            if (guestType == GuestType.NewCustomer)
+            // Handle NewGuest selection
+            if (guestType == GuestType.NewGuest)
             {
                 Console.WriteLine("Skapa ny kund:");
                 CreateGuestController();  // Skapa ny kund
                 guestId = GetLatestGuestId(); // Hämta ID för den nyss skapade kunden
             }
-            else if (guestType == GuestType.ExistingCustomer)
+            // Handle ExistingGuest selection
+            else if (guestType == GuestType.ExistingGuest)
             {
                 // Om användaren väljer befintlig kund, fråga efter kundnummer
                 Console.WriteLine("Ange gästens kundnummer: ");
@@ -143,9 +197,14 @@ namespace HotellApp.Controllers.GuestController
                         Console.WriteLine($"Gäst funnen: {existingGuest.FirstName} {existingGuest.LastName}");
                     }
                 }
+                else
+                {
+                    Console.WriteLine("Ogiltigt kundnummer. Försök igen.");
+                }
             }
 
-            return (guestType, guestId); // Returnera vilken typ av kund som valdes och deras ID (eller null om ingen hittades)
+            // Return the selected guest type and the associated guest ID
+            return (guestType, guestId);
         }
 
         private string ValidatePhoneNumber()
@@ -158,12 +217,11 @@ namespace HotellApp.Controllers.GuestController
                 {
                     break;
                 }
-                AnsiConsole.WriteLine("[red]Fel: Telefonnummer får endast innehålla siffror![/]");
+                AnsiConsole.Markup("[red]Felaktig input: Telefonnummer får endast innehålla siffror!\n[/]");
             }
             return phoneNumber;
         }
 
-        // Metod för att validera e-postadress (måste innehålla ett '@')
         private string ValidateEmailAddress()
         {
             string email;
@@ -174,9 +232,60 @@ namespace HotellApp.Controllers.GuestController
                 {
                     break;
                 }
-                AnsiConsole.WriteLine("[red]Fel: Vänligen ange en giltig e-postadress som innehåller '@' och '.'[/]");
+                AnsiConsole.Markup("[red]Felaktig input: Vänligen ange en giltig e-postadress som innehåller '@' och '.'\n[/]");
             }
             return email;
+        }
+
+        public Guest GetGuestDetailsFromUser(Guest currentGuestData)
+        {
+            int guestId;
+            while (true)
+            {
+                guestId = AnsiConsole.Ask<int>("Ange gästens kundnummer: ");
+                var existingGuest = _guestService.ReadGuest(guestId);  // Assuming _guestService.ReadGuest fetches guest by ID
+
+                if (existingGuest != null)
+                {
+                    break; // If guest is found, break out of the loop
+                }
+                else
+                {
+                    Console.Clear();
+                    AnsiConsole.Markup("[red]Ogiltigt kundnummer, försök igen.[/]\n");
+                    
+                }
+            }
+
+            //highlighta gamla namnet?
+            var guestFirstName = AnsiConsole.Ask<string>(
+                $"Registrerat förnamn på gäst: " +
+                $"{currentGuestData.FirstName}. " +
+                $"Ange nytt förnamn: ");
+
+            var guestLastName = AnsiConsole.Ask<string>
+                ($"Registrerat efternamn på gäst: " +
+                $"{currentGuestData.LastName}. " +
+                $"Ange nytt efternamn: ");
+
+            //skulle vilja få in att man ser det förra numret också
+            var guestPhoneNumber = ValidatePhoneNumber();
+
+            //gamla emailaddressen syns inte nu
+            var guestEmailAdress = ValidateEmailAddress();
+            var statusOfGuest = AnsiConsole.Prompt(
+                new SelectionPrompt<GuestStatus>()
+                .Title("Ändra status på gäst: Välj ny status på gäst:")
+                .AddChoices(GuestStatus.Inactive, GuestStatus.Active));
+
+            return new Guest
+            {
+                FirstName = guestFirstName,
+                LastName = guestLastName,
+                PhoneNumber = guestPhoneNumber,
+                EmailAdress = guestEmailAdress,
+                GuestStatus = statusOfGuest
+            };
         }
     }
 }
