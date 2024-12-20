@@ -77,6 +77,56 @@ namespace HotellApp.Services.RoomServices
            
         }
 
+        public void ChangeRoomStatusForDateRange(int roomId, StatusOfRoom newStatus, DateTime startDate, DateTime endDate)
+        {
+            var existingStatus = _dbContext.RoomStatusHistory
+                .FirstOrDefault(rsh => rsh.RoomId == roomId && rsh.StartDate <= startDate && (rsh.EndDate == null || rsh.EndDate >= startDate));
+
+            if (existingStatus != null)
+            {
+                existingStatus.Status = newStatus;
+                existingStatus.StartDate = startDate;
+                existingStatus.EndDate = endDate;
+            }
+            else
+            {
+                var newRoomStatusHistory = new RoomStatusHistory
+                {
+                    RoomId = roomId,
+                    Status = newStatus,
+                    StartDate = startDate,
+                    EndDate = endDate
+                };
+                _dbContext.RoomStatusHistory.Add(newRoomStatusHistory);
+            }
+
+            _dbContext.SaveChanges();
+        }
+
+        public List<Room> GetAvailableRooms(TypeOfRoom roomType, DateTime arrivalDate, DateTime departureDate, sbyte amountOfRooms)
+        {
+            // Hitta alla rum av den angivna typen
+            var allRooms = _dbContext.Room.Where(r => r.RoomType == roomType).ToList();
+
+            // Hitta rummen som är tillgängliga för det angivna datumintervallet
+            var availableRooms = new List<Room>();
+
+            foreach (var room in allRooms)
+            {
+                var roomStatuses = _dbContext.RoomStatusHistory
+                    .Where(rsh => rsh.RoomId == room.RoomID && rsh.StartDate < departureDate && (rsh.EndDate == null || rsh.EndDate > arrivalDate))
+                    .ToList();
+
+                // Om rummet inte har några statushistorik som blockerar det under den här perioden, är det tillgängligt
+                if (!roomStatuses.Any())
+                {
+                    availableRooms.Add(room);
+                }
+            }
+
+            return availableRooms.Take(amountOfRooms).ToList();
+        }
+
 
     }
 }

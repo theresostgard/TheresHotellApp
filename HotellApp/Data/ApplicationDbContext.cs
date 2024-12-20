@@ -19,6 +19,8 @@ namespace HotellApp.Data
 
         public DbSet<Room> Room { get; set; }
 
+        public DbSet<RoomStatusHistory> RoomStatusHistory { get; set; }
+
         public ApplicationDbContext()
         {
 

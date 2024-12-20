@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using HotellApp.Services.BookingServices;
 using HotellApp.Controllers.GuestController;
+using HotellApp.Services.RoomServices;
 
 namespace HotellApp.Controllers.BookingController
 {
@@ -15,11 +16,13 @@ namespace HotellApp.Controllers.BookingController
     {
         private readonly IBookingService _bookingService;
         private readonly IGuestController _guestController;
+        private readonly IRoomService _roomService;
 
-        public BookingController(IBookingService bookingService, IGuestController guestController)
+        public BookingController(IBookingService bookingService, IGuestController guestController, IRoomService roomService)
         {
             _bookingService = bookingService;
             _guestController = guestController;
+            _roomService = roomService;
         }
 
         public void CreateBookingController()
@@ -29,32 +32,64 @@ namespace HotellApp.Controllers.BookingController
             if (guestId == null)
             {
                 Console.WriteLine("Kundval kunde inte genomföras. Avslutar bokningen.");
-                return; // If no valid customer was selected, exit the method.
+                return; 
             }
 
             Console.WriteLine("Ange bokningsdetaljer:");
-            if (guestId.HasValue)
-            {
-                var booking = new Booking
-                {
-                    //här behöver kundens namn hämtas på något sätt
-                    GuestId = guestId.Value,
-                    ArrivalDate = AnsiConsole.Ask<DateTime>("Ankomstdatum (yyyy-MM-dd):"),
-                    DepartureDate = AnsiConsole.Ask<DateTime>("Avresedatum (yyyy-MM-dd):"),
-                    RoomType = AnsiConsole.Ask<TypeOfRoom>("Rumstyp: (enkel(1), dubbel(2)"),
-                    AmountOfGuests = AnsiConsole.Ask<sbyte>("Antal gäster: "),
-                    AmountOfRooms = AnsiConsole.Ask<sbyte>("Antal rum:")
+            
+            var arrivalDate = AnsiConsole.Ask<DateTime>("Ankomstdatum (yyyy-MM-dd):");
+            var departureDate = AnsiConsole.Ask<DateTime>("Avresedatum (yyyy-MM-dd):");
 
-                };
-                _bookingService.CreateBooking(booking);
-                AnsiConsole.WriteLine("Ny bokning skapad.");
-            }
-            else
+            var roomType = AnsiConsole.Prompt(
+                new SelectionPrompt<TypeOfRoom>()
+                    .Title("Välj rumsyp:")
+                    .AddChoices(TypeOfRoom.Single, TypeOfRoom.Double));
+
+            var amountOfGuests = AnsiConsole.Ask<sbyte>("Antal gäster: ");
+            var isExtraBedWanted = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                .Title("Önskas extrasängar?")
+                .AddChoices("Ja", "Nej")
+                ) == "Ja";
+            int amountOfExtraBeds = 0;
+            if (isExtraBedWanted)
             {
-                Console.WriteLine("Ogiltigt kundnummer.");
+                amountOfExtraBeds = AnsiConsole.Ask<int>("Hur många extrasängar önskas?");
             }
-            
-            
+
+            var amountOfRooms = AnsiConsole.Ask<sbyte>("Antal rum: ");
+
+            // Kontrollera tillgänglighet av rummen
+            var availableRooms = _roomService.GetAvailableRooms(roomType, arrivalDate, departureDate, amountOfRooms);
+
+            if (availableRooms.Count == 0)
+            {
+                Console.WriteLine("Inga tillgängliga rum för den valda rumstypen och datumintervallet.");
+                return; // Om inga rum är tillgängliga, avsluta bokningen
+            }
+
+            // Om rummen är tillgängliga, skapa bokningen
+            var booking = new Booking
+            {
+                GuestId = guestId.Value,
+                ArrivalDate = arrivalDate,
+                DepartureDate = departureDate,
+                RoomType = roomType,
+                AmountOfGuests = amountOfGuests,
+                AmountOfRooms = amountOfRooms,
+                AmountOfExtraBeds = isExtraBedWanted ? amountOfExtraBeds : 0
+            };
+
+            _bookingService.CreateBooking(booking);
+
+            // Uppdatera rumsstatus till "Ockuperat" för de bokade rummen
+            foreach (var room in availableRooms)
+            {
+                _roomService.ChangeRoomStatusForDateRange(room.RoomID, StatusOfRoom.Reserved, arrivalDate, departureDate);
+            }
+
+            AnsiConsole.WriteLine("Ny bokning skapad och rumsstatus uppdaterad.");
+
         }
 
         public void ReadAllBookingsController()

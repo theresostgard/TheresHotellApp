@@ -17,7 +17,7 @@ namespace HotellApp.Controllers.GuestController
 
         public GuestController(IGuestService guestService)
         {
-            _guestService = guestService; //?? throw new ArgumentNullException(nameof(guestService)); 
+            _guestService = guestService;  
         }
         public void CreateGuestController()
         {
@@ -90,7 +90,6 @@ namespace HotellApp.Controllers.GuestController
 
         public int GetLatestGuestId()
         {
-            //Console.WriteLine("Hämtar id för den senast skapade kunden: ");
 
             var latestGuest = _guestService.GetLatestGuestId();
             Console.WriteLine(latestGuest);
@@ -102,7 +101,7 @@ namespace HotellApp.Controllers.GuestController
             GuestType guestType;
             int? guestId = null;
 
-            // Fråga användaren om de vill skapa en ny eller välja en befintlig kund
+          
             while (true)
             {
                 Console.WriteLine("Är det en ny (1) eller befintlig (2) kund?");
@@ -110,7 +109,7 @@ namespace HotellApp.Controllers.GuestController
 
                 if (Enum.TryParse(guestInput, out guestType) && Enum.IsDefined(typeof(GuestType), guestType))
                 {
-                    break; // Om vi får ett giltigt svar, gå vidare
+                    break; 
                 }
                 else
                 {
@@ -118,7 +117,6 @@ namespace HotellApp.Controllers.GuestController
                 }
             }
 
-            // Om användaren väljer ny kund
             if (guestType == GuestType.NewCustomer)
             {
                 Console.WriteLine("Skapa ny kund:");
