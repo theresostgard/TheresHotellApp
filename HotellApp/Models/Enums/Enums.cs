@@ -14,7 +14,7 @@ namespace HotellApp.Models.Enums
 
     public enum StatusOfRoom
     {
-        Available = 1,     //tillgängligt 
+        Active = 1,     //tillgängligt 
         InActive = 2,       //deletat
         UnderMaintenance = 3,
         Reserved = 4

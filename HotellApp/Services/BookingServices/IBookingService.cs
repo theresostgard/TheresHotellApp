@@ -10,7 +10,7 @@ namespace HotellApp.Services.BookingServices
 {
     public interface IBookingService
     {
-        void CreateBooking(Booking booking, List<Room> rooms);
+        void CreateBooking(Booking booking);
         List<Booking> GetAllBookings();
 
         Booking ReadBooking(int id);
@@ -23,5 +23,9 @@ namespace HotellApp.Services.BookingServices
             DateTime departureDate,
             int amountOfRooms,
             out List<Room> availableRooms);
+
+        void AddRoomsToBooking(List<BookingRoom> bookingRooms);
     }
+
+    
 }

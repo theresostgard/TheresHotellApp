@@ -32,14 +32,34 @@ namespace HotellApp.Controllers.BookingController
             if (guestId == null)
             {
                 Console.WriteLine("Kundval kunde inte genomföras. Avslutar bokningen.");
-                return; 
+                return;
             }
 
-
             Console.WriteLine("Ange bokningsdetaljer:");
+
+            DateTime arrivalDate;
+            do
+            {
+                arrivalDate = AnsiConsole.Ask<DateTime>("Ankomstdatum (yyyy-MM-dd):");
+                if (arrivalDate < DateTime.Now.Date) // Om ankomstdatumet är tidigare än dagens datum
+                {
+                    Console.WriteLine("Ankomstdatumet måste vara ett framtida datum. Försök igen.");
+                }
+            } while (arrivalDate < DateTime.Now.Date); // Loop tills ett giltigt datum anges
+
             
-            var arrivalDate = AnsiConsole.Ask<DateTime>("Ankomstdatum (yyyy-MM-dd):");
-            var departureDate = AnsiConsole.Ask<DateTime>("Avresedatum (yyyy-MM-dd):");
+
+            DateTime departureDate;
+            do
+            {
+                departureDate = AnsiConsole.Ask<DateTime>("Avresedatum (yyyy-MM-dd):");
+
+                if (departureDate <= arrivalDate)
+                {
+                    Console.WriteLine("Avresedatumet måste vara efter ankomstdatumet. Försök igen.");
+                }
+            }
+            while (departureDate <= arrivalDate);
 
             var roomType = AnsiConsole.Prompt(
                 new SelectionPrompt<TypeOfRoom>()
@@ -52,7 +72,6 @@ namespace HotellApp.Controllers.BookingController
 
             if (roomType == TypeOfRoom.Double)
             {
-                // Fråga om extrasäng om det är ett dubbelrum
                 var isExtraBedWanted = AnsiConsole.Prompt(
                     new SelectionPrompt<string>()
                         .Title("Önskas extrasäng?")
@@ -61,8 +80,7 @@ namespace HotellApp.Controllers.BookingController
 
                 if (isExtraBedWanted)
                 {
-                    amountOfExtraBeds = AnsiConsole.Ask<int>
-                        ("Hur många extrasängar önskas?");
+                    amountOfExtraBeds = AnsiConsole.Ask<int>("Hur många extrasängar önskas?");
                 }
 
                 isExtraBedAllowed = true;
@@ -73,12 +91,11 @@ namespace HotellApp.Controllers.BookingController
             // Kontrollera tillgänglighet av rummen
             var availableRooms = _roomService.GetAvailableRooms(roomType, arrivalDate, departureDate, amountOfRooms);
 
-            if (!_bookingService.TryGetAvailableRoomsForBooking(roomType, arrivalDate, departureDate, amountOfRooms, out availableRooms))
+            if (availableRooms == null || availableRooms.Count < amountOfRooms)
             {
-                Console.WriteLine("Inga tillgängliga rum för den valda rumstypen och datumintervallet.");
+                Console.WriteLine("Det finns inte tillräckligt med tillgängliga rum för den valda rumstypen och datumintervallet.");
                 return;
             }
-
 
             // Om rummen är tillgängliga, skapa bokningen
             var booking = new Booking
@@ -92,55 +109,84 @@ namespace HotellApp.Controllers.BookingController
                 AmountOfExtraBeds = isExtraBedAllowed ? amountOfExtraBeds : 0
             };
 
+            // Skapa bokningen först och få tillgång till BookingId
+            _bookingService.CreateBooking(booking);
+
+            // Nu när bokningen är skapad och har ett BookingId, skapa BookingRoom-poster för att koppla rum till bokningen
             var bookingRooms = new List<BookingRoom>();
-            foreach (var availableRoomToReserve in availableRooms)
+            foreach (var availableRoomToReserve in availableRooms.Take(amountOfRooms)) // Se till att vi inte tilldelar fler rum än användaren vill ha
             {
                 var bookingRoom = new BookingRoom
                 {
                     RoomId = availableRoomToReserve.RoomId,
-                    BookingId = booking.BookingId,  // Koppla bokningen till rummet
-                    Room = availableRoomToReserve // Om du vill att rummet ska vara med i objektet
+                    BookingId = booking.BookingId  // Koppla bokningen till rummet
                 };
                 bookingRooms.Add(bookingRoom);
             }
-                _bookingService.CreateBooking(booking, availableRooms);
 
-            AnsiConsole.WriteLine("Ny bokning skapad och rumsstatus uppdaterad.");
+            foreach (var room in availableRooms.Take(amountOfRooms))
+            {
+                _roomService.ChangeRoomStatusForDateRange(room.RoomId, StatusOfRoom.Reserved, arrivalDate, departureDate);
+            }
+            // Lägg till de tilldelade rummen i databasen
+            _bookingService.AddRoomsToBooking(bookingRooms);
+
+            // Uppdatera rumsstatus till "Ockuperat" för de bokade rummen
+            foreach (var room in availableRooms.Take(amountOfRooms))
+            {
+                _roomService.ChangeRoomStatusForDateRange(room.RoomId, StatusOfRoom.Reserved, arrivalDate, departureDate);
+            }
+
+
+            AnsiConsole.WriteLine($"Ny bokning skapad med bokningsnr {booking.BookingId}.");
 
         }
 
         public void ReadAllBookingsController()
         {
-            var bookings = _bookingService.GetAllBookings();
-            if (bookings.Count == 0)
-            {
-                Console.WriteLine("Inga bokningar hittades.");
-            }
-            else
+            var bookings = _bookingService.GetAllBookings();  // Hämtar alla bokningar
+
+            if (bookings != null && bookings.Any())  // Kontrollera om det finns några bokningar
             {
                 foreach (var booking in bookings)
                 {
-                    if (booking.BookingId != null)
+                    // Kontrollera om Booking.Guest inte är null
+                    var guestName = booking.Guest != null ? $"{booking.Guest.FirstName} {booking.Guest.LastName}" : "Ingen gäst kopplad";
+
+                    Console.WriteLine($"Bokning ID: {booking.BookingId}\n" +
+                                      $"Gästens namn: {guestName}\n" +
+                                      $"Ankomstdatum: {booking.ArrivalDate}\n" +
+                                      $"Avresedatum: {booking.DepartureDate}\n" +
+                                      $"Antal rum: {booking.AmountOfRooms}\n" +
+                                      $"Antal gäster: {booking.AmountOfGuests}");
+
+                    if(booking.BookingRooms == null || !booking.BookingRooms.Any())
                     {
-
-
-                        Console.WriteLine("_________________________________________________________________\n");
-                        Console.WriteLine($"Bokningsnummer: {booking.BookingId}\n" +
-                            //$"Kundens namn: {booking.FirstName}, {booking.LastName}\n " +
-                            $"Ankomstdatum: {booking.ArrivalDate}\n" +
-                            $"Avresedatum: {booking.DepartureDate}\n" +
-                            $"Rumstyp: {booking.RoomType}\n" +
-                            $"Antal gäster: {booking.AmountOfGuests}, antal rum: {booking.AmountOfRooms}\n"); //+
-                           // $"Kontaktuppgift: {booking.PhoneNumber}");
-                        Console.WriteLine("\n_________________________________________________________________\n");
+                        Console.WriteLine("Inga rum kopplade till denna bokning.");
+                        continue;
                     }
-                    else
+                    foreach (var bookingRoom in booking.BookingRooms)
                     {
-                        Console.WriteLine($"Bokningsnummer {booking.BookingId} har ingen kopplad kund.");
+                        if (bookingRoom.Room != null)
+                        {
+                            var room = bookingRoom.Room;
+                            Console.WriteLine($"Rum ID: {room.RoomId}, Rumstyp: {room.RoomType}, Storlek: {room.RoomSize} kvm\n" +
+                                $"____________________________________________________");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Rum kopplat till bokningen saknas.");
+                        }
                     }
                 }
             }
+            else
+            {
+                Console.WriteLine("Inga bokningar hittades.");
+            }
+      
         }
+        
 
         public void ReadBookingController()
         {

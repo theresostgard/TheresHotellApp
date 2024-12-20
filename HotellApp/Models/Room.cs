@@ -12,7 +12,7 @@ namespace HotellApp.Models
 
         public AmountOfExtraBedsAllowedInRoom? AmountOfExtraBeds { get; set; }
 
-        public StatusOfRoom Status { get; set; } = StatusOfRoom.Available;
+        public StatusOfRoom Status { get; set; } = StatusOfRoom.Active;
 
         public ICollection<BookingRoom>? BookingRooms { get; set; }
 

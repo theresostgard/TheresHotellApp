@@ -159,7 +159,7 @@ namespace HotellApp.Controllers.RoomController
             var newStatus = AnsiConsole.Prompt(
                 new SelectionPrompt<StatusOfRoom>()
                 .Title("Ändra status på rummet: Välj den nya statusen på rummet: ")
-                .AddChoices(StatusOfRoom.Available, StatusOfRoom.InActive));
+                .AddChoices(StatusOfRoom.Active, StatusOfRoom.InActive));
                 _roomService.DeleteRoom(roomId, newStatus);
             AnsiConsole.WriteLine($"Statusen för rum {roomId} har ändrats till {newStatus}.");
         }

@@ -1,6 +1,7 @@
 ﻿using HotellApp.Data;
 using HotellApp.Models;
 using HotellApp.Models.Enums;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,35 +20,38 @@ namespace HotellApp.Services.BookingServices
         }
 
 
-        public void CreateBooking(Booking booking, List<Room> rooms)
+        public void CreateBooking(Booking booking)
         {
             
-                _dbContext.Booking.Add(booking);
-            foreach (var room in rooms)
-            {
-                _dbContext.BookingRoom.Add(new BookingRoom
-                {
-                    BookingId = booking.BookingId,
-                    RoomId = room.RoomId
-                });
-            }
+            _dbContext.Booking.Add(booking);
             _dbContext.SaveChanges();
-            
+        }
 
+        public void AddRoomsToBooking(List<BookingRoom> bookingRooms)
+        {
+            _dbContext.BookingRoom.AddRange(bookingRooms); // Lägger till alla BookingRoom-poster
+            _dbContext.SaveChanges(); // Spara ändringarna i databasen
         }
 
 
         public Booking ReadBooking(int bookingId)
         {
             var booking = _dbContext.Booking
-                         .FirstOrDefault(b => b.BookingId == bookingId);
+            .Include(b => b.BookingRooms)
+            .ThenInclude(br => br.Room)  // Inkludera rummen som är kopplade till bokningen
+            .Include(g => g.Guest)
+            .FirstOrDefault(b => b.BookingId == bookingId);
 
             return booking;
         }
 
         public List<Booking> GetAllBookings()
         {
-            return _dbContext.Booking.ToList();
+            return _dbContext.Booking
+                .Include(g => g.Guest)
+                .Include(b => b.BookingRooms)
+                .ThenInclude(r => r.Room)
+                .ToList();
         }
 
         // Uppdaterar en bokning
@@ -90,7 +94,7 @@ namespace HotellApp.Services.BookingServices
         {
             // Hämta tillgängliga rum baserat på rumstyp och datumintervall
             availableRooms = _dbContext.Room
-                .Where(r => r.RoomType == roomType && r.Status == StatusOfRoom.Available)
+                .Where(r => r.RoomType == roomType && r.Status == StatusOfRoom.Active)
                 .ToList();
 
             // Om användaren valde extrasängar för dubbelrum
