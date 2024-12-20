@@ -1,4 +1,5 @@
 ﻿using HotellApp.Models;
+using HotellApp.Models.Enums;
 
 namespace HotellApp.Services.RoomServices
 {
@@ -8,6 +9,6 @@ namespace HotellApp.Services.RoomServices
         Room ReadRoom(int roomId);
         List<Room> GetAllRooms();
         void UpdateRoom(int roomId, Room updatedRoom);
-        void DeleteRoom(int roomId);
+        void DeleteRoom(int roomId, StatusOfRoom newStatus);
     }
 }

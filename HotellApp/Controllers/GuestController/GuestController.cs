@@ -21,14 +21,14 @@ namespace HotellApp.Controllers.GuestController
         }
         public void CreateGuestController()
         {
-            
+
 
             var guest = new Guest
             {
                 FirstName = AnsiConsole.Ask<string>("Förnamn: "),
                 LastName = AnsiConsole.Ask<string>("Efternamn"),
-                PhoneNumber = AnsiConsole.Ask<string>("Telefonnummer: "),
-                EmailAdress = AnsiConsole.Ask<string>("Emailadress: "),
+                PhoneNumber = ValidatePhoneNumber(),
+                EmailAdress = ValidateEmailAddress(),
 
             };
 
@@ -148,6 +148,37 @@ namespace HotellApp.Controllers.GuestController
             }
 
             return (guestType, guestId); // Returnera vilken typ av kund som valdes och deras ID (eller null om ingen hittades)
+        }
+
+        private string ValidatePhoneNumber()
+        {
+            string phoneNumber;
+            while (true)
+            {
+                phoneNumber = AnsiConsole.Ask<string>("Telefonnummer (endast siffror): ");
+                if (phoneNumber.All(char.IsDigit))
+                {
+                    break;
+                }
+                AnsiConsole.WriteLine("[red]Fel: Telefonnummer får endast innehålla siffror![/]");
+            }
+            return phoneNumber;
+        }
+
+        // Metod för att validera e-postadress (måste innehålla ett '@')
+        private string ValidateEmailAddress()
+        {
+            string email;
+            while (true)
+            {
+                email = AnsiConsole.Ask<string>("Emailadress: ");
+                if (email.Contains("@") && email.Contains("."))
+                {
+                    break;
+                }
+                AnsiConsole.WriteLine("[red]Fel: Vänligen ange en giltig e-postadress som innehåller '@' och '.'[/]");
+            }
+            return email;
         }
     }
 }

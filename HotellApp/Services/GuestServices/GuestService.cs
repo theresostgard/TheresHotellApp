@@ -16,7 +16,7 @@ namespace HotellApp.Services.GuestServices
 
         public GuestService(ApplicationDbContext dbContext)
         {
-            _dbContext = dbContext; // ?? throw new ArgumentNullException(nameof(dbContext));
+            _dbContext = dbContext; 
         }
 
         public Guest CreateGuest(Guest guest)

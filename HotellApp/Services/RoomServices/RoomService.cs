@@ -1,5 +1,6 @@
 ﻿using HotellApp.Data;
 using HotellApp.Models;
+using HotellApp.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +21,7 @@ namespace HotellApp.Services.RoomServices
         public void CreateRoom(Room room)
         {
             _dbContext.Room.Add(room);
-            //_dbContext.SaveChanges();
+            _dbContext.SaveChanges();
         }
 
         public Room ReadRoom(int roomId)
@@ -32,6 +33,10 @@ namespace HotellApp.Services.RoomServices
 
         public List<Room> GetAllRooms()
         {
+            if (_dbContext.Room == null)
+            {
+                Console.WriteLine("Inga rum hittades.");
+            }
             return _dbContext.Room.ToList();
         }
 
@@ -45,10 +50,10 @@ namespace HotellApp.Services.RoomServices
                 room.RoomSize = updatedRoom.RoomSize;
                 room.IsExtraBedAllowed = updatedRoom.IsExtraBedAllowed;
                 room.AmountOfExtraBeds = updatedRoom.AmountOfExtraBeds;
-                //room.Status = updatedRoom.Status; eventuellt överflödigt, ska man endast i DELETE kunna ändra status?
+                
 
-                //_dbContext.SaveChanges();
-                Console.WriteLine($"Rummet med rumsnr {roomId} har uppdaterats!");
+                _dbContext.SaveChanges();
+               
             }
             else
             {
@@ -56,29 +61,20 @@ namespace HotellApp.Services.RoomServices
             }
 
         }
-        public void DeleteRoom(int roomId)
+        public void DeleteRoom(int roomId, StatusOfRoom newStatus)
         {
-            //var roomToChangeStatusOn = _dbContext.Rooms.FirstOrDefault(r => r.RoomID == roomId);
-            //if (roomToChangeStatusOn != null)
-            //{
-
-            //    if (roomToChangeStatusOn.Status = StatusOfRoom.Active)
-            //    {
-            //        roomToChangeStatusOn.Status = StatusOfRoom.InActive;
-            //        Console.WriteLine($"Rummet med rumsnr {roomId} är nu markerat som inaktivt i systemet.");
-            //        //_dbContext.SaveChanges();
-            //    }
-            //    else
-            //    {
-            //        roomToChangeStatusOn.Status = StatusOfRoom.Active;
-            //        Console.WriteLine($"Rummet med rumsnr {roomId} är nu markerat som aktivt i systemet.");
-            //        //_dbContext.SaveChanges();
-            //    }
-            //}
-            //else
-            //{
-            //    Console.WriteLine($"Rummet med rumsnr {roomId} hittades inte.");
-            //}
+            
+            var room = _dbContext.Room.FirstOrDefault(r => r.RoomID == roomId);
+            if (room != null)
+            {
+                room.Status = newStatus;  // Sätt den nya statusen för rummet
+                _dbContext.SaveChanges();
+            }
+            else
+            {
+                Console.WriteLine($"Rummet med rumsnr {roomId} hittades inte.");
+            }
+           
         }
 
 
