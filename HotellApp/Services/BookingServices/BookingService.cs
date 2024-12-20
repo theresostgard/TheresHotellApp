@@ -1,5 +1,6 @@
 ﻿using HotellApp.Data;
 using HotellApp.Models;
+using HotellApp.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,11 +19,19 @@ namespace HotellApp.Services.BookingServices
         }
 
 
-        public void CreateBooking(Booking booking)
+        public void CreateBooking(Booking booking, List<Room> rooms)
         {
             
                 _dbContext.Booking.Add(booking);
-                _dbContext.SaveChanges();
+            foreach (var room in rooms)
+            {
+                _dbContext.BookingRoom.Add(new BookingRoom
+                {
+                    BookingId = booking.BookingId,
+                    RoomId = room.RoomId
+                });
+            }
+            _dbContext.SaveChanges();
             
 
         }
@@ -76,6 +85,23 @@ namespace HotellApp.Services.BookingServices
             {
                 Console.WriteLine("Booking not found.");
             }
+        }
+        public bool TryGetAvailableRoomsForBooking(TypeOfRoom roomType, DateTime arrivalDate, DateTime departureDate, int amountOfRooms, out List<Room> availableRooms)
+        {
+            // Hämta tillgängliga rum baserat på rumstyp och datumintervall
+            availableRooms = _dbContext.Room
+                .Where(r => r.RoomType == roomType && r.Status == StatusOfRoom.Available)
+                .ToList();
+
+            // Om användaren valde extrasängar för dubbelrum
+            if (roomType == TypeOfRoom.Double)
+            {
+                // Kontrollera om det finns rum med tillräckligt utrymme för extrasängar
+                availableRooms = availableRooms.Where(r => r.RoomSize >= 15).ToList();
+            }
+
+            // Om det inte finns tillräckligt med rum returnera false
+            return availableRooms.Count >= amountOfRooms;
         }
     }
 }

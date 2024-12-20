@@ -57,7 +57,7 @@ namespace HotellApp.Controllers.RoomController
             };
             _roomService.CreateRoom(room);
 
-            AnsiConsole.WriteLine($"Nytt rum skapades med rumsnr: {room.RoomID}\n" +
+            AnsiConsole.WriteLine($"Nytt rum skapades med rumsnr: {room.RoomId}\n" +
                 $"Rumstyp: {room.RoomType}\nStorlek: {room.RoomSize} kvm.");
         }
 
@@ -90,7 +90,7 @@ namespace HotellApp.Controllers.RoomController
                 if (room != null)
                 {
                     AnsiConsole.WriteLine($"Rumsinfo:\n" +
-                        $"ID: {room.RoomID}\n" +
+                        $"ID: {room.RoomId}\n" +
                         $"Rumstyp: {room.RoomType}\n" +
                         $"Rumsstorlek: {room.RoomSize}\n" +
                         $"Extrasängar tillåtet?: {room.IsExtraBedAllowed}\n" +
@@ -126,7 +126,7 @@ namespace HotellApp.Controllers.RoomController
                 foreach (var room in rooms)
                 {
                     Console.WriteLine("_________________________________________________________________\n");
-                    Console.WriteLine($"Rumsnummer: {room.RoomID}\n" +
+                    Console.WriteLine($"Rumsnummer: {room.RoomId}\n" +
                         $"Rumstyp: {room.RoomType}\n " +
                         $"Rumsstorlek: {room.RoomSize}\n" +
                         $"Tillåtet med extrasäng? {room.IsExtraBedAllowed}\n" +
@@ -159,7 +159,7 @@ namespace HotellApp.Controllers.RoomController
             var newStatus = AnsiConsole.Prompt(
                 new SelectionPrompt<StatusOfRoom>()
                 .Title("Ändra status på rummet: Välj den nya statusen på rummet: ")
-                .AddChoices(StatusOfRoom.Active, StatusOfRoom.InActive));
+                .AddChoices(StatusOfRoom.Available, StatusOfRoom.InActive));
                 _roomService.DeleteRoom(roomId, newStatus);
             AnsiConsole.WriteLine($"Statusen för rum {roomId} har ändrats till {newStatus}.");
         }

@@ -26,7 +26,7 @@ namespace HotellApp.Services.RoomServices
 
         public Room ReadRoom(int roomId)
         {
-            var room = _dbContext.Room.FirstOrDefault(r => r.RoomID == roomId);
+            var room = _dbContext.Room.FirstOrDefault(r => r.RoomId == roomId);
 
             return room;
         }
@@ -42,7 +42,7 @@ namespace HotellApp.Services.RoomServices
 
         public void UpdateRoom(int roomId, Room updatedRoom)
         {
-            var room = _dbContext.Room.FirstOrDefault(r => r.RoomID == roomId);
+            var room = _dbContext.Room.FirstOrDefault(r => r.RoomId == roomId);
 
             if (room != null)
             {
@@ -64,7 +64,7 @@ namespace HotellApp.Services.RoomServices
         public void DeleteRoom(int roomId, StatusOfRoom newStatus)
         {
             
-            var room = _dbContext.Room.FirstOrDefault(r => r.RoomID == roomId);
+            var room = _dbContext.Room.FirstOrDefault(r => r.RoomId == roomId);
             if (room != null)
             {
                 room.Status = newStatus;  // Sätt den nya statusen för rummet
@@ -114,7 +114,7 @@ namespace HotellApp.Services.RoomServices
             foreach (var room in allRooms)
             {
                 var roomStatuses = _dbContext.RoomStatusHistory
-                    .Where(rsh => rsh.RoomId == room.RoomID && rsh.StartDate < departureDate && (rsh.EndDate == null || rsh.EndDate > arrivalDate))
+                    .Where(rsh => rsh.RoomId == room.RoomId && rsh.StartDate < departureDate && (rsh.EndDate == null || rsh.EndDate > arrivalDate))
                     .ToList();
 
                 // Om rummet inte har några statushistorik som blockerar det under den här perioden, är det tillgängligt
