@@ -21,7 +21,8 @@ using Microsoft.Extensions.Configuration;
 using System.ComponentModel;
 using IContainer = Autofac.IContainer;
 using HotellApp.Services.ServiceFactory;
-using HotellApp.Utilities;
+using HotellApp.Utilities.ListDisplay;
+using HotellApp.Utilities.DisplayGuest;
 
 
 namespace HotellApp.Services
@@ -59,6 +60,7 @@ namespace HotellApp.Services
             builder.RegisterType<HotellApp.Services.ServiceFactorys.ServiceFactory>().As<IServiceFactory>().InstancePerLifetimeScope();
 
             builder.RegisterType<DisplayLists>().As<IDisplayLists>().InstancePerLifetimeScope();
+           
 
             var container = builder.Build();
 

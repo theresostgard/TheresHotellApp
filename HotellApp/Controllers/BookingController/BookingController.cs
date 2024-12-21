@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using HotellApp.Services.BookingServices;
 using HotellApp.Controllers.GuestController;
 using HotellApp.Services.RoomServices;
+using HotellApp.Utilities.ListDisplay;
+using HotellApp.Utilities.BookingDisplay;
 
 namespace HotellApp.Controllers.BookingController
 {
@@ -17,16 +19,22 @@ namespace HotellApp.Controllers.BookingController
         private readonly IBookingService _bookingService;
         private readonly IGuestController _guestController;
         private readonly IRoomService _roomService;
+        private readonly IDisplayLists _displayLists;
 
-        public BookingController(IBookingService bookingService, IGuestController guestController, IRoomService roomService)
+        public BookingController(IBookingService bookingService,
+            IGuestController guestController,
+            IRoomService roomService,
+            IDisplayLists displayLists)
         {
             _bookingService = bookingService;
             _guestController = guestController;
             _roomService = roomService;
+            _displayLists = displayLists;
         }
 
         public void CreateBookingController()
         {
+            Console.Clear();
             var (guestType, guestId) = _guestController.SelectCustomerType();
 
             if (guestId == null)
@@ -47,7 +55,7 @@ namespace HotellApp.Controllers.BookingController
                 }
             } while (arrivalDate < DateTime.Now.Date); // Loop tills ett giltigt datum anges
 
-            
+
 
             DateTime departureDate;
             do
@@ -137,10 +145,11 @@ namespace HotellApp.Controllers.BookingController
                 _roomService.ChangeRoomStatusForDateRange(room.RoomId, StatusOfRoom.Reserved, arrivalDate, departureDate);
             }
 
-
             AnsiConsole.WriteLine($"Ny bokning skapad med bokningsnr {booking.BookingId}.");
 
         }
+
+
 
         public void ReadAllBookingsController()
         {
@@ -153,12 +162,7 @@ namespace HotellApp.Controllers.BookingController
                     // Kontrollera om Booking.Guest inte är null
                     var guestName = booking.Guest != null ? $"{booking.Guest.FirstName} {booking.Guest.LastName}" : "Ingen gäst kopplad";
 
-                    Console.WriteLine($"Bokning ID: {booking.BookingId}\n" +
-                                      $"Gästens namn: {guestName}\n" +
-                                      $"Ankomstdatum: {booking.ArrivalDate}\n" +
-                                      $"Avresedatum: {booking.DepartureDate}\n" +
-                                      $"Antal rum: {booking.AmountOfRooms}\n" +
-                                      $"Antal gäster: {booking.AmountOfGuests}");
+                    DisplayBooking.DisplayBookingInformation(booking);
 
                     bool noRoomConnectedToBooking = booking.BookingRooms == null || !booking.BookingRooms.Any();
 
@@ -171,11 +175,20 @@ namespace HotellApp.Controllers.BookingController
                     {
                         if (bookingRoom.Room != null)
                         {
+
                             var room = bookingRoom.Room;
-                            Console.WriteLine($"Rum ID: {room.RoomId}, Rumstyp: {room.RoomType}, Storlek: {room.RoomSize} kvm\n" +
-                                $"____________________________________________________");
+                            var roomInfo = new Markup($"[yellow]RumsNr: {room.RoomId}[/]\n" +
+                                                       $"[yellow]Rumstyp: {room.RoomType}[/]\n" +
+                                                       $"[yellow]Storlek: {room.RoomSize} kvm[/]\n");
+
+                            AnsiConsole.Write(
+                            new Panel(roomInfo)
+                            .BorderColor(Color.Red) 
+                            .Header($"Bokningsnr {booking.BookingId}") 
+                            .Border(BoxBorder.Square)
+                            );
                         }
-                        else if(!noRoomConnectedToBooking)
+                        else if (!noRoomConnectedToBooking)
                         {
                             Console.WriteLine("Rum kopplat till bokningen saknas.");
                         }
@@ -186,14 +199,46 @@ namespace HotellApp.Controllers.BookingController
             {
                 Console.WriteLine("Inga bokningar hittades.");
             }
-      
+
         }
-        
+
 
         public void ReadBookingController()
         {
-            ReadAllBookingsController();
-            Console.WriteLine("Ska man kunna välja ett specifikt bokningsnr för att visa just den bokningen?");     //StudentDB har exempel jag kan modifiera
+
+
+            bool IsContinuingReading = true;
+
+            while (IsContinuingReading)
+            {
+                Console.Clear();
+                _displayLists.DisplayBookings();
+
+                var bookingId = AnsiConsole.Prompt(
+                new TextPrompt<int>("Ange bokningens ID: "));
+
+                Console.Clear();
+                var booking = _bookingService.ReadBooking(bookingId);
+
+                if (booking != null)
+                {
+                    DisplayBooking.DisplayBookingInformation(booking);
+                }
+                else
+                {
+                    AnsiConsole.MarkupLine($"[red]Ingen bokning med bokningsnr[/] [green]{bookingId}[/] [red]hittades.[/]\n");
+                }
+
+                var continueOption = AnsiConsole.Prompt(
+                        new SelectionPrompt<string>()
+                        .Title("Vill du se information om en annan bokning?")
+                        .AddChoices("Ja", "Nej"));
+
+                if (continueOption == "Nej")
+                {
+                    IsContinuingReading = false;  // Stäng av loopen om användaren inte vill fortsätta
+                }
+            }
         }
 
         public void UpdateBookingController()

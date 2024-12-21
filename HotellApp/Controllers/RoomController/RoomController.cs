@@ -7,7 +7,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using HotellApp.Utilities;
+using HotellApp.Utilities.ListDisplay;
+using HotellApp.Utilities.RoomDisplay;
 
 namespace HotellApp.Controllers.RoomController
 {
@@ -93,12 +94,7 @@ namespace HotellApp.Controllers.RoomController
 
                 if (room != null)
                 {
-                    AnsiConsole.WriteLine($"Rumsinfo:\n" +
-                        $"ID: {room.RoomId}\n" +
-                        $"Rumstyp: {room.RoomType}\n" +
-                        $"Rumsstorlek: {room.RoomSize}\n" +
-                        $"Extrasängar tillåtet?: {room.IsExtraBedAllowed}\n" +
-                        $"Hur många extrasängar är tillåtet i rummet: {room.AmountOfExtraBeds}\n");
+                  DisplayRoom.DisplayRoomInformation(room);
                 }
                 else
                 {
@@ -129,14 +125,7 @@ namespace HotellApp.Controllers.RoomController
             {
                 foreach (var room in rooms)
                 {
-                    Console.WriteLine("_________________________________________________________________\n");
-                    Console.WriteLine($"Rumsnummer: {room.RoomId}\n" +
-                        $"Rumstyp: {room.RoomType}\n " +
-                        $"Rumsstorlek: {room.RoomSize}\n" +
-                        $"Tillåtet med extrasäng? {room.IsExtraBedAllowed}\n" +
-                        $"Antal extrasängar (om tillåtet): {room.AmountOfExtraBeds}\n" +
-                        $"Rummets status: {room.Status}");
-                    Console.WriteLine("\n_________________________________________________________________\n");
+                    DisplayRoom.DisplayRoomInformation(room);
                 }
             }
         }
@@ -153,7 +142,7 @@ namespace HotellApp.Controllers.RoomController
             
             // Uppdatera rummet via tjänsten
             _roomService.UpdateRoom(roomId, updatedRoom);
-            AnsiConsole.WriteLine($"Rummet med ID {roomId} har uppdaterats.");
+            AnsiConsole.MarkupLine($"Rummet med ID [green]{roomId}[/] har uppdaterats.");
         }
 
         public void DeleteRoomController()
@@ -173,7 +162,7 @@ namespace HotellApp.Controllers.RoomController
 
             if (result)
             {
-                AnsiConsole.WriteLine($"Statusen för rum {roomId} har ändrats till {newStatus}.");
+                AnsiConsole.MarkupLine($"Statusen för rum [green]{roomId}[/] har ändrats till [green]{newStatus}[]/.");
             }
             else
             {
@@ -229,5 +218,19 @@ namespace HotellApp.Controllers.RoomController
                 AmountOfExtraBeds = amountOfExtraBeds
             };
         }
+        public List<Room> CheckRoomAvailability(TypeOfRoom roomType, DateTime arrivalDate, DateTime departureDate, int amountOfRooms)
+        {
+            var availableRooms = _roomService.GetAvailableRooms(roomType, arrivalDate, departureDate, (sbyte)amountOfRooms);
+            return availableRooms;
+        }
+
+        public void ChangeRoomStatusForBooking(List<Room> rooms, DateTime arrivalDate, DateTime departureDate)
+        {
+            foreach (var room in rooms)
+            {
+                _roomService.ChangeRoomStatusForDateRange(room.RoomId, StatusOfRoom.Reserved, arrivalDate, departureDate);
+            }
+        }
+
     }
 }

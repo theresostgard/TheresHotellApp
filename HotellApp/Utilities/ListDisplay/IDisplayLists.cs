@@ -1,4 +1,4 @@
-﻿namespace HotellApp.Utilities
+﻿namespace HotellApp.Utilities.ListDisplay
 {
     public interface IDisplayLists
     {

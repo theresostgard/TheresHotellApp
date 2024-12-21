@@ -8,12 +8,18 @@ using System.Threading.Tasks;
 
 namespace HotellApp.Services.MenuServices.BookingMenues
 {
-    public class BookingMenu(IBookingController bookingController) : IBookingMenu
+    public class BookingMenu : IBookingMenu
     {
 
         //private readonly IServiceFactory _serviceFactory;
         //private readonly IBookingService _bookingService;
-        private readonly IBookingController _bookingController = bookingController;
+        private readonly IBookingController _bookingController;
+
+        public BookingMenu(IBookingController bookingController)
+        {
+            _bookingController = bookingController;
+        }
+
 
         private readonly string[] _menuItems =
             {

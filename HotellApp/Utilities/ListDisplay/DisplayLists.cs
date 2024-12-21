@@ -1,4 +1,5 @@
 ﻿using HotellApp.Data;
+using HotellApp.Models;
 using HotellApp.Models.Enums;
 using Spectre.Console;
 using System;
@@ -7,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HotellApp.Utilities
+namespace HotellApp.Utilities.ListDisplay
 {
     public class DisplayLists : IDisplayLists
     {
@@ -24,14 +25,21 @@ namespace HotellApp.Utilities
             var readAllGuests = _dbContext.Guest
                 .ToList();
 
+            var table = new Table();
+            table.AddColumn("GästId");
+            table.AddColumn("Förnamn");
+            table.AddColumn("Efternamn");
             foreach (var guest in readAllGuests)
             {
-                AnsiConsole.MarkupLine($"GästId: [green]{guest.GuestId}[/]\n" +
-                    $"Förnamn: {guest.FirstName}, " +
-                    $"Efternamn: {guest.LastName}\n" +
-                    $"___________________________________________");
+
+                string guestIdWithColor = $"[green]{guest.GuestId}[/]";
+                string guestFirstNameWithColor = $"[white]{guest.FirstName}[/]";
+                string guestLastNameWithColor = $"[blue]{guest.LastName}[/]";
+
+                table.AddRow(guestIdWithColor, guestFirstNameWithColor, guestLastNameWithColor);
             }
-            
+            AnsiConsole.Render(table);
+
         }
 
         public void DisplayRooms()
@@ -39,7 +47,11 @@ namespace HotellApp.Utilities
             var readAllRooms = _dbContext.Room
                 .ToList();
 
-            var table = new Table();
+            var table = new Table()
+            {
+                Border = TableBorder.Double,
+            };
+            
             table.AddColumn("RumsId");
             table.AddColumn("Rumstyp");
             table.AddColumn("Status");
@@ -54,8 +66,16 @@ namespace HotellApp.Utilities
                                              "[white]UnderMaintenance[/]";
 
                 table.AddRow(roomIdWithColor, roomTypeWithColor, roomStatusWithColor);
+
+               
             }
-            AnsiConsole.Render(table);
+            AnsiConsole.Write(
+                  new Panel(table)
+                      .BorderColor(Color.Green) // Färg på ramen
+                      .Header($" Rumsinformation ") // Lägg till header
+                      .Border(BoxBorder.Double)
+                      );// dubbel ram
+            //AnsiConsole.Render(table);
         }
 
         public void DisplayBookings()
@@ -63,10 +83,21 @@ namespace HotellApp.Utilities
             var readAllBookings = _dbContext.Booking
                 .ToList();
 
-          //var table = new Table();
-          //  table.AddColumn("BokningsNr");
-          //  table.AddColumn("Ankomstdag");
-          //  table.AddColumn("Avresedag");
+            var table = new Table();
+            table.AddColumn("BokningsNr");
+            table.AddColumn("Ankomstdag");
+            table.AddColumn("Avresedag");
+
+            foreach (var booking in readAllBookings)
+            {
+                string bookingIdWithColor = $"[green]{booking.BookingId}[/]";
+                string arrivalDateWithColor = $"[white]{booking.ArrivalDate}[/]";
+                string departureWithColor = $"[blue]{booking.DepartureDate}[/]";
+
+                table.AddRow(bookingIdWithColor, arrivalDateWithColor, departureWithColor);
+            }
+
+            AnsiConsole.Render(table);
 
         }
 
