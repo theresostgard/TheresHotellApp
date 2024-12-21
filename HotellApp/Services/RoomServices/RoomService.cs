@@ -1,6 +1,7 @@
 ﻿using HotellApp.Data;
 using HotellApp.Models;
 using HotellApp.Models.Enums;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -61,20 +62,48 @@ namespace HotellApp.Services.RoomServices
             }
 
         }
-        public void DeleteRoom(int roomId, StatusOfRoom newStatus)
+        public bool DeleteRoom(int roomId, StatusOfRoom newStatus)
         {
-            
+
+            if (HasUpcomingBookings(roomId))
+            {
+                Console.WriteLine("Kan inte ändra status på rummet, " +
+                    "det finns bokningar de kommande 3 månaderna.");
+                return false;
+            }
+
             var room = _dbContext.Room.FirstOrDefault(r => r.RoomId == roomId);
+
             if (room != null)
             {
-                room.Status = newStatus;  // Sätt den nya statusen för rummet
+                // Uppdatera statusen på rummet istället för att ta bort det
+                room.Status = newStatus;
                 _dbContext.SaveChanges();
+                Console.WriteLine($"Statusen för rum med RoomId {roomId} har ändrats till {newStatus}.");
+                return true;
             }
             else
             {
-                Console.WriteLine($"Rummet med rumsnr {roomId} hittades inte.");
+                Console.WriteLine("Inget rum hittades.");
+                return false;
             }
-           
+
+        }
+
+        private bool HasUpcomingBookings(int roomId)
+        {
+            // Kontrollera om rummet har bokningar de kommande 3 månaderna
+            var bookings = _dbContext.BookingRoom
+                .Include(br => br.Booking)
+                .Where(br => br.RoomId == roomId &&
+                             br.Booking.ArrivalDate <= DateTime.Now.AddMonths(3) &&
+                             br.Booking.DepartureDate >= DateTime.Now)
+                .ToList();
+
+            Console.WriteLine($"Antal bokningar hittade för rummet: {bookings.Count}");
+
+            // Returnera true om det finns bokningar, annars false
+            return bookings.Count > 0;
         }
 
         public void ChangeRoomStatusForDateRange(int roomId, StatusOfRoom newStatus, DateTime startDate, DateTime endDate)

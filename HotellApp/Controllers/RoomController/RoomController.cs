@@ -154,14 +154,26 @@ namespace HotellApp.Controllers.RoomController
 
         public void DeleteRoomController()
         {
-            //få in en lista med rumsnummer och status på rummen
+            // Få in rumsnummer för det rum som ska ändras
             var roomId = AnsiConsole.Ask<int>("Ange rumsnummer för det rum du vill ändra status på: ");
+
+            // Fråga användaren om vilken status de vill sätta på rummet
             var newStatus = AnsiConsole.Prompt(
                 new SelectionPrompt<StatusOfRoom>()
-                .Title("Ändra status på rummet: Välj den nya statusen på rummet: ")
-                .AddChoices(StatusOfRoom.Active, StatusOfRoom.InActive));
-                _roomService.DeleteRoom(roomId, newStatus);
-            AnsiConsole.WriteLine($"Statusen för rum {roomId} har ändrats till {newStatus}.");
+                    .Title("Välj den nya statusen på rummet: ")
+                    .AddChoices(StatusOfRoom.Active, StatusOfRoom.InActive, StatusOfRoom.UnderMaintenance));
+
+            // Försök att ändra statusen på rummet
+            var result = _roomService.DeleteRoom(roomId, newStatus);
+
+            if (result)
+            {
+                AnsiConsole.WriteLine($"Statusen för rum {roomId} har ändrats till {newStatus}.");
+            }
+            else
+            {
+                AnsiConsole.WriteLine("Statusändringen misslyckades.");
+            }
         }
 
         public Room GetRoomDetailsFromUser(Room currentRoom)
@@ -173,7 +185,7 @@ namespace HotellApp.Controllers.RoomController
                     .AddChoices(TypeOfRoom.Single, TypeOfRoom.Double));
 
             
-            var roomSize = AnsiConsole.Ask<int>($"Nuvarande storlek: {currentRoom.RoomSize} kvm. Ange ny storlek:");
+            var roomSize = AnsiConsole.Ask<int>($"Nuvarande storlek: {currentRoom.RoomSize} kvm.\nAnge ny storlek:");
 
             
             bool canHaveExtraBed = roomSize >= 15;

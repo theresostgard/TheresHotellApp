@@ -144,20 +144,12 @@ namespace HotellApp.Controllers.GuestController
             {
                 
                 
-                Console.WriteLine("Är det en ny (1) eller befintlig (2) kund?");
+                //Console.WriteLine("Är det en ny (1) eller befintlig (2) kund?");
                 guestType = AnsiConsole.Prompt(
                     new SelectionPrompt<GuestType>()
                     .Title("Är det en ny eller befintlig gäst? ")
                     .AddChoices(GuestType.NewGuest, GuestType.ExistingGuest));
 
-                //if (Enum.TryParse(guestInput, out guestType) && Enum.IsDefined(typeof(GuestType), guestType))
-                //{
-                //    break; 
-                //}
-                //else
-                //{
-                //    Console.WriteLine("Ogiltigt val. Försök igen.");
-                //}
 
                 if (guestType == GuestType.NewGuest || guestType == GuestType.ExistingGuest)
                 {
