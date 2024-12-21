@@ -1,6 +1,7 @@
 ﻿using HotellApp.Models;
 using HotellApp.Models.Enums;
 using HotellApp.Services.GuestServices;
+using HotellApp.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Spectre.Console;
 using System;
@@ -14,10 +15,12 @@ namespace HotellApp.Controllers.GuestController
     public class GuestController : IGuestController
     {
         private readonly IGuestService _guestService;
+        private readonly IDisplayLists _displayLists;
 
-        public GuestController(IGuestService guestService)
+        public GuestController(IGuestService guestService, IDisplayLists displayLists)
         {
             _guestService = guestService;  
+            _displayLists = displayLists;
         }
         public void CreateGuestController()
         {
@@ -82,8 +85,12 @@ namespace HotellApp.Controllers.GuestController
 
         public void ReadGuestController()
         {
+            _displayLists.DisplayGuests();
+            
             var guestId = AnsiConsole.Prompt(
                    new TextPrompt<int>("Ange gästens kundnummer: "));
+
+            Console.Clear();
 
             var guest = _guestService.ReadGuest(guestId);
 
@@ -92,7 +99,9 @@ namespace HotellApp.Controllers.GuestController
                 AnsiConsole.WriteLine($"Gäst funnen:\n" +
                     $"GästId: {guest.GuestId}\n" +
                     $"Förnamn: {guest.FirstName}\n" +
-                    $"Efternamn: {guest.LastName}\n");
+                    $"Efternamn: {guest.LastName}\n" +
+                    $"Telefonnummer: {guest.PhoneNumber}\n" +
+                    $"Mailadress: {guest.EmailAdress}");
             }
             else
             {

@@ -7,16 +7,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HotellApp.Utilities;
 
 namespace HotellApp.Controllers.RoomController
 {
     public class RoomController : IRoomController
     {
         private readonly IRoomService _roomService;
+        private readonly IDisplayLists _displayLists;
 
-        public RoomController(IRoomService roomService)
+        public RoomController(IRoomService roomService, IDisplayLists displayLists)
         {
             _roomService = roomService;
+            _displayLists = displayLists;
         }
         public void CreateRoomController()
         {
@@ -80,11 +83,12 @@ namespace HotellApp.Controllers.RoomController
             while (IsContinuingReading)
             {
                 Console.Clear();
-                // var allRooms = _roomService.Rooms;
+                _displayLists.DisplayRooms();
 
                 var roomID = AnsiConsole.Prompt(
                 new TextPrompt<int>("Ange Rummets ID: "));
 
+                Console.Clear();
                 var room = _roomService.ReadRoom(roomID);
 
                 if (room != null)
@@ -154,6 +158,7 @@ namespace HotellApp.Controllers.RoomController
 
         public void DeleteRoomController()
         {
+
             // Få in rumsnummer för det rum som ska ändras
             var roomId = AnsiConsole.Ask<int>("Ange rumsnummer för det rum du vill ändra status på: ");
 
