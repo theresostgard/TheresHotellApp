@@ -21,7 +21,8 @@ namespace HotellApp.Utilities.BookingDisplay
                                         $"[yellow]Rumstyp:[/] {booking.RoomType}\n" +
                                         $"[yellow]Antal gäster:[/] {booking.AmountOfGuests}\n" +
                                         $"[yellow]Antal extrasängar: [/] {booking.AmountOfExtraBeds}\n" +
-                                        $"[yellow]Antal rum: [/] {booking.AmountOfRooms}\n");
+                                        $"[yellow]Antal rum: [/] {booking.AmountOfRooms}\n" +
+                                        $"[yellow]Bokningens status: [/] {booking.Status}");
 
                 // Visa ramat information i en Box
                 AnsiConsole.Write(

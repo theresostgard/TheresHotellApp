@@ -8,35 +8,41 @@ namespace HotellApp.Models.Enums
 {
     public enum TypeOfRoom
     {
-        Double = 2,
-        Single = 1
+        Double,
+        Single
     }
 
     public enum StatusOfRoom
     {
-        Active = 1,     //tillgängligt 
-        InActive = 2,       //deletat
-        UnderMaintenance = 3,
-        Reserved = 4
+        Active,     //tillgängligt 
+        InActive,       //deletat
+        UnderMaintenance,
+        Reserved
     }
 
 
     public enum GuestType
     {
-        NewGuest = 1,
-        ExistingGuest = 2
+        NewGuest,
+        ExistingGuest
     }
 
     public enum AmountOfExtraBedsAllowedInRoom
     {
-        None = 0,
+        None = 0,   
         One = 1,
-        Two = 2
+        Two = 2,
     }
 
     public enum GuestStatus
     {
-        Active = 1,
-        Inactive = 0
+        Active,
+        Inactive
+    }
+
+    public enum BookingStatus
+    {
+        Active,
+        Inactive
     }
 }
