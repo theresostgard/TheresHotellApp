@@ -16,11 +16,15 @@ namespace HotellApp.Controllers.RoomController
     {
         private readonly IRoomService _roomService;
         private readonly IDisplayLists _displayLists;
+        private readonly IDisplayRoom _displayRoom;
 
-        public RoomController(IRoomService roomService, IDisplayLists displayLists)
+        public RoomController(IRoomService roomService, 
+            IDisplayLists displayLists, 
+            IDisplayRoom displayRoom)
         {
             _roomService = roomService;
             _displayLists = displayLists;
+            _displayRoom = displayRoom;
         }
         public void CreateRoomController()
         {
@@ -94,7 +98,7 @@ namespace HotellApp.Controllers.RoomController
 
                 if (room != null)
                 {
-                  DisplayRoom.DisplayRoomInformation(room);
+                  _displayRoom.DisplayRoomInformation(room);
                 }
                 else
                 {
@@ -117,17 +121,12 @@ namespace HotellApp.Controllers.RoomController
         {
             Console.Clear();
             var rooms = _roomService.GetAllRooms();
-            if (rooms.Count == 0)
+            if (rooms == null || rooms.Count == 0)
             {
-                Console.WriteLine("Inga rum hittades.");
+                AnsiConsole.MarkupLine("[red]Inga rum hittades![/]");
+                return;
             }
-            else
-            {
-                foreach (var room in rooms)
-                {
-                    DisplayRoom.DisplayRoomInformation(room);
-                }
-            }
+            _displayRoom.Pagination(rooms);
         }
 
         public void UpdateRoomController()

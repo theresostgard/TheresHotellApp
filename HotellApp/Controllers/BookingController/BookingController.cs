@@ -262,82 +262,16 @@ namespace HotellApp.Controllers.BookingController
 
         public void ReadAllBookingsController()
         {
-            bool isReadingBookings = true;
-            var bookings = _bookingService.GetAllBookings();  // Hämtar alla bokningar
+           
+            var bookings = _bookingService.GetAllBookings(); // Hämtar alla bokningar
 
             if (bookings == null || !bookings.Any())
             {
-                Console.WriteLine("Inga bokningar hittades.");
+                AnsiConsole.MarkupLine("[red]Bokningen hittades inte![/]");
                 return;
             }
 
-            int pageSize = 2; // Antal bokningar per sida
-            int currentPage = 0;
-            int totalPages = (int)Math.Ceiling(bookings.Count / (double)pageSize);
-
-            while (isReadingBookings)
-            {
-                Console.Clear();
-
-                // Hämta bokningar för aktuell sida
-                var bookingsToDisplay = bookings.Skip(currentPage * pageSize).Take(pageSize).ToList();
-
-                // Rendera bokningar på aktuell sida
-                foreach (var booking in bookingsToDisplay)
-                {
-                    var guestName = booking.Guest != null ? $"{booking.Guest.FirstName} {booking.Guest.LastName}" : "Ingen gäst kopplad";
-                    DisplayBooking.DisplayBookingInformation(booking);
-
-                    bool noRoomConnectedToBooking = booking.BookingRooms == null || !booking.BookingRooms.Any();
-
-                    if (noRoomConnectedToBooking)
-                    {
-                        Console.WriteLine("Inga rum kopplade till denna bokning.");
-                        continue;
-                    }
-
-                    foreach (var bookingRoom in booking.BookingRooms)
-                    {
-                        if (bookingRoom.Room != null)
-                        {
-                            var room = bookingRoom.Room;
-                            var roomInfo = new Markup($"[yellow]RumsNr: {room.RoomId}[/]\n" +
-                                                       $"[yellow]Rumstyp: {room.RoomType}[/]\n" +
-                                                       $"[yellow]Storlek: {room.RoomSize} kvm[/]\n");
-
-                            AnsiConsole.Write(
-                                new Panel(roomInfo)
-                                .BorderColor(Color.Red)
-                                .Header($"Bokningsnr {booking.BookingId}")
-                                .Border(BoxBorder.Square)
-                            );
-                        }
-                        else
-                        {
-                            Console.WriteLine("Rum kopplat till bokningen saknas.");
-                        }
-                    }
-                }
-
-                // Visa sidinformation och navigeringsalternativ
-                AnsiConsole.MarkupLine($"\nSida [yellow]{currentPage + 1}[/] av [green]{totalPages}[/]");
-                AnsiConsole.MarkupLine("[blue]◄[/] Föregående sida   [blue]►[/] Nästa sida");
-                AnsiConsole.MarkupLine("[red]Esc[/]: Avsluta");
-
-                var key = Console.ReadKey(true).Key;
-
-                switch (key)
-                {
-                    case ConsoleKey.RightArrow:
-                        if (currentPage < totalPages - 1) currentPage++;
-                        break;
-                    case ConsoleKey.LeftArrow:
-                        if (currentPage > 0) currentPage--;
-                        break;
-                    case ConsoleKey.Escape:
-                        return; // Avsluta programmet
-                }
-            }
+            _displayBooking.Pagination(bookings); // Hantera visning och paginering
         }
 
 
@@ -361,7 +295,7 @@ namespace HotellApp.Controllers.BookingController
 
                 if (booking != null)
                 {
-                    DisplayBooking.DisplayBookingInformation(booking);
+                    _displayBooking.DisplayBookingInformation(booking);
                 }
                 else
                 {
@@ -417,9 +351,7 @@ namespace HotellApp.Controllers.BookingController
             Console.Clear();
             AnsiConsole.MarkupLine("[bold green]Uppdatera bokningsdetaljer[/]");
 
-            // Visa aktuell bokning i en tabell
-            var currentBookingTable = _displayBooking.CreateBookingTable(currentBooking, "Nuvarande bokningsinformation", Color.Aqua);
-            AnsiConsole.Write(currentBookingTable);
+            _displayBooking.ShowCurrentBooking(currentBooking);
 
             AnsiConsole.MarkupLine("[gray]För att behålla det aktuella värdet, tryck bara på Enter.[/]");
 
@@ -453,24 +385,8 @@ namespace HotellApp.Controllers.BookingController
                     .ValidationErrorMessage("[red]Antalet rum måste vara minst 1![/]")
                     .Validate(rooms => rooms > 0 ? ValidationResult.Success() : ValidationResult.Error("[red]Antalet rum måste vara större än 0![/]")));
 
-            AnsiConsole.MarkupLine("\n[bold green]Sammanfattning av uppdaterad bokning:[/]");
-
-            var updatedTable = new Table()
-                .BorderColor(Color.Green)
-                .Border(TableBorder.Double);
-            updatedTable.AddColumn(new TableColumn("Egenskap").Width(20));
-            updatedTable.AddColumn(new TableColumn("Ny information").Width(30));
-
-            updatedTable.AddRow("[red]Boknings-ID[/]", currentBooking.BookingId.ToString());
-            updatedTable.AddRow("[red]Ankomstdatum[/]", arrivalDate.ToString("yyyy-MM-dd"));
-            updatedTable.AddRow("[red]Avresedatum[/]", departureDate.ToString("yyyy-MM-dd"));
-            updatedTable.AddRow("[red]Rumstyp[/]", roomType.ToString());
-            updatedTable.AddRow("[red]Antal gäster[/]", amountOfGuests.ToString());
-            updatedTable.AddRow("[red]Antal rum[/]", amountOfRooms.ToString());
-
-            AnsiConsole.Write(updatedTable);
-
-            // Vänta på att användaren ska trycka en tangent innan vi fortsätter
+            _displayBooking.ShowUpdatedBookingSummary(currentBooking, arrivalDate, departureDate, roomType, amountOfGuests, amountOfRooms);
+ 
             Console.ReadKey();
             // Returnera uppdaterad bokning
             return new Booking
