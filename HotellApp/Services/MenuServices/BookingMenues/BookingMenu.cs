@@ -8,12 +8,15 @@ using System.Threading.Tasks;
 
 namespace HotellApp.Services.MenuServices.BookingMenues
 {
-    public class BookingMenu(IBookingController bookingController) : IBookingMenu
+    public class BookingMenu : IBookingMenu
     {
+        private readonly IBookingController _bookingController;
 
-        //private readonly IServiceFactory _serviceFactory;
-        //private readonly IBookingService _bookingService;
-        private readonly IBookingController _bookingController = bookingController;
+        public BookingMenu(IBookingController bookingController)
+        {
+            _bookingController = bookingController;
+        }
+
 
         private readonly string[] _menuItems =
             {
@@ -25,25 +28,22 @@ namespace HotellApp.Services.MenuServices.BookingMenues
                 "Tillbaka till huvudmenyn"
             };
 
-        //    
-        //}
         public void ShowBookingOptions()
         {
             int selectedIndex = 0;
-            //_menuManager.ShowMenu();
+      
             MenuRenderer.ShowMenu(_menuItems, ref selectedIndex, "Bokningsmeny", HandleMenuSelection);
         }
 
         private void HandleMenuSelection(int selectedIndex)
         {
-            //var bookingService = _serviceFactory.GetService<IBookingService>();
+
             string selectedItem = _menuItems[selectedIndex];
             switch (selectedItem)
             {
                 case "Skapa bokning":
-                    //MenuActionHelper.ExecuteMenuAction<IBookingService>
-                    //    (_serviceFactory, service => bookingService.CreateBooking());
                     _bookingController.CreateBookingController();
+                    Console.ReadKey();
                     break;
                 case "Visa en bokning":
                     _bookingController.ReadBookingController();
@@ -51,28 +51,23 @@ namespace HotellApp.Services.MenuServices.BookingMenues
                 case "Visa alla bokningar":
                     Console.Clear();
                     _bookingController.ReadAllBookingsController();
-                    //_bookingService.ReadBooking();
+                    Console.ReadKey();
                     break;
                 case "Uppdatera bokning":
                     Console.Clear();
                     _bookingController.UpdateBookingController();
-                    //_bookingService.UpdateBooking();
                     break;
                 case "Radera bokning":
                     Console.Clear();
                     _bookingController.DeleteBookingController();
-                    //_bookingService.DeleteBooking();
                     break;
                 case "Tillbaka till huvudmenyn":
-                    //Console.WriteLine("Tillbaka till huvudmenyn...");
+     
                     return;
                 default:
                     Console.WriteLine("Ogiltigt val.");
                     break;
             }
-
-            Console.WriteLine("\nTryck på valfri tangent för att fortsätta...");
-            Console.ReadKey();
 
         }
 

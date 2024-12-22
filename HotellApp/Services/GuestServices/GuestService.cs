@@ -48,11 +48,18 @@ namespace HotellApp.Services.GuestServices
         public void UpdateGuest(int guestId, Guest updatedGuest)
         {
 
-            var guest = _dbContext.Guest.FirstOrDefault(c => c.GuestId == guestId);
+            var guest = _dbContext.Guest
+                .Include(b => b.Bookings)
+                .FirstOrDefault(c => c.GuestId == guestId);
 
-            if (guest != null)
+            if (guest == null)
             {
-               
+
+                AnsiConsole.WriteLine("Ingen gäst med det GästId:t kunde hittas.");
+                
+            }
+            if (guest.Bookings == null || guest.Bookings.Count == 0)
+            {
                 guest.FirstName = updatedGuest.FirstName;
                 guest.LastName = updatedGuest.LastName;
                 guest.PhoneNumber = updatedGuest.PhoneNumber;
@@ -61,11 +68,10 @@ namespace HotellApp.Services.GuestServices
 
                 _dbContext.Entry(guest).State = EntityState.Modified;
                 _dbContext.SaveChanges();
-                
             }
             else
             {
-                AnsiConsole.WriteLine("Kunden kunde inte hittas.");
+                AnsiConsole.WriteLine("Gästens status kan inte uppdateras för den har bokningar.");
             }
 
             
@@ -73,26 +79,24 @@ namespace HotellApp.Services.GuestServices
         public string DeleteGuest(int guestId)
         {
 
-            var guest = _dbContext.Guest.FirstOrDefault(c => c.GuestId == guestId);
+            var guest = _dbContext.Guest
+            .Include(g => g.Bookings)
+            .FirstOrDefault(c => c.GuestId == guestId);
 
-            if (guest != null)
+            if (guest == null)
             {
-                // Check if the guest has any bookings. Assuming Bookings is a collection (like a list or a navigation property).
-                if (guest.Bookings == null || guest.Bookings.Count == 0)
-                {
-                    _dbContext.Guest.Remove(guest);  // Remove the guest from the context
-                    _dbContext.SaveChanges();  // Persist the changes to the database
-                    return "Gästen har raderats.";
-                }
-                else
-                {
-                    return "Gästen har bokningar och kan inte tas bort";
+                return "Ingen gäst med det GästId:t kunde hittas.";
+            }
 
-                }
+            if (guest.Bookings == null || guest.Bookings.Count == 0)
+            {
+                _dbContext.Guest.Remove(guest);  // Ta bort gästen från kontexten
+                _dbContext.SaveChanges();        // Spara ändringarna till databasen
+                return "Gästen har raderats.";
             }
             else
             {
-                return "Ingen gäst med det GästId:t kunde hittas.";
+                return "Gästen har bokningar och kan inte tas bort.";
             }
         }
 
@@ -113,5 +117,7 @@ namespace HotellApp.Services.GuestServices
             
 
         }
+
+
     }
 }

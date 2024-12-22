@@ -10,12 +10,8 @@ namespace HotellApp.Services.MenuServices.RoomMenues
 {
     public class RoomMenu(IRoomController roomController) : IRoomMenu
     {
-        //private readonly IServiceFactory _serviceFactory;
-        //private readonly IRoomService _roomService;
-        //private readonly MenuManager _menuManager;
+
         private readonly IRoomController _roomController = roomController;
-
-
 
         private readonly string[] _menuItems =
             {
@@ -28,37 +24,26 @@ namespace HotellApp.Services.MenuServices.RoomMenues
             };
 
 
-        //_menuManager = new MenuManager(menuItems, HandleMenuSelection);
-        //}
-
         public void ShowRoomOptions()
         {
             int selectedIndex = 0;
             MenuRenderer.ShowMenu(_menuItems, ref selectedIndex, "Rumsmeny", HandleMenuSelection);
-            //_menuManager.ShowMenu();
         }
 
         private void HandleMenuSelection(int selectedIndex)
         {
-
-            //var roomService = _serviceFactory.GetService<IRoomService>();
             string selectedItem = _menuItems[selectedIndex];
             switch (selectedItem)
             {
                 case "Lägg till nytt rum":
-                    //Console.Clear();
-                    //_roomService.CreateRoom();
-                    //MenuActionHelper.ExecuteMenuAction<IRoomService>
-                    //(_serviceFactory, service => roomService.CreateRoom());
                     _roomController.CreateRoomController();
                     break;
                 case "Visa ett rum":
-                    //Console.Clear();
                     _roomController.ReadRoomController();
-                    //_roomService.ReadRoom();
                     break;
                 case "Visa alla rum":
                     _roomController.ReadAllRoomsController();
+                    Console.ReadKey();
                     break;
                 case "Uppdatera rum":
                     _roomController.UpdateRoomController();
@@ -73,9 +58,6 @@ namespace HotellApp.Services.MenuServices.RoomMenues
                     Console.WriteLine("Ogiltigt val.");
                     break;
             }
-
-            Console.WriteLine("\nTryck på valfri tangent för att fortsätta...");
-            Console.ReadKey();
 
         }
 

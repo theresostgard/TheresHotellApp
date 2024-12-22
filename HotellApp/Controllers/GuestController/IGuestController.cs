@@ -1,4 +1,5 @@
-﻿using HotellApp.Models.Enums;
+﻿using HotellApp.Models;
+using HotellApp.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,8 @@ namespace HotellApp.Controllers.GuestController
         void DeleteGuestController();
         int GetLatestGuestId();
         (GuestType, int?) SelectCustomerType();
+
+        Guest GetGuestDetailsFromUser(Guest currentGuestData);
 
     }
 }

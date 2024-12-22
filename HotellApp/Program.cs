@@ -14,6 +14,8 @@ namespace HotellApp
         {
             var container = ContainerConfig.Configure();
             var app = new Application(container);
+
+
             app.Run();
 
         }

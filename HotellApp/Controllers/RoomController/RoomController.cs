@@ -7,16 +7,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HotellApp.Utilities.ListDisplay;
+using HotellApp.Utilities.RoomDisplay;
 
 namespace HotellApp.Controllers.RoomController
 {
     public class RoomController : IRoomController
     {
         private readonly IRoomService _roomService;
+        private readonly IDisplayLists _displayLists;
 
-        public RoomController(IRoomService roomService)
+        public RoomController(IRoomService roomService, IDisplayLists displayLists)
         {
             _roomService = roomService;
+            _displayLists = displayLists;
         }
         public void CreateRoomController()
         {
@@ -80,21 +84,17 @@ namespace HotellApp.Controllers.RoomController
             while (IsContinuingReading)
             {
                 Console.Clear();
-                // var allRooms = _roomService.Rooms;
+                _displayLists.DisplayRooms();
 
                 var roomID = AnsiConsole.Prompt(
                 new TextPrompt<int>("Ange Rummets ID: "));
 
+                Console.Clear();
                 var room = _roomService.ReadRoom(roomID);
 
                 if (room != null)
                 {
-                    AnsiConsole.WriteLine($"Rumsinfo:\n" +
-                        $"ID: {room.RoomId}\n" +
-                        $"Rumstyp: {room.RoomType}\n" +
-                        $"Rumsstorlek: {room.RoomSize}\n" +
-                        $"Extrasängar tillåtet?: {room.IsExtraBedAllowed}\n" +
-                        $"Hur många extrasängar är tillåtet i rummet: {room.AmountOfExtraBeds}\n");
+                  DisplayRoom.DisplayRoomInformation(room);
                 }
                 else
                 {
@@ -125,14 +125,7 @@ namespace HotellApp.Controllers.RoomController
             {
                 foreach (var room in rooms)
                 {
-                    Console.WriteLine("_________________________________________________________________\n");
-                    Console.WriteLine($"Rumsnummer: {room.RoomId}\n" +
-                        $"Rumstyp: {room.RoomType}\n " +
-                        $"Rumsstorlek: {room.RoomSize}\n" +
-                        $"Tillåtet med extrasäng? {room.IsExtraBedAllowed}\n" +
-                        $"Antal extrasängar (om tillåtet): {room.AmountOfExtraBeds}\n" +
-                        $"Rummets status: {room.Status}");
-                    Console.WriteLine("\n_________________________________________________________________\n");
+                    DisplayRoom.DisplayRoomInformation(room);
                 }
             }
         }
@@ -149,11 +142,12 @@ namespace HotellApp.Controllers.RoomController
             
             // Uppdatera rummet via tjänsten
             _roomService.UpdateRoom(roomId, updatedRoom);
-            AnsiConsole.WriteLine($"Rummet med ID {roomId} har uppdaterats.");
+            AnsiConsole.MarkupLine($"Rummet med ID [green]{roomId}[/] har uppdaterats.");
         }
 
         public void DeleteRoomController()
         {
+
             // Få in rumsnummer för det rum som ska ändras
             var roomId = AnsiConsole.Ask<int>("Ange rumsnummer för det rum du vill ändra status på: ");
 
@@ -168,7 +162,7 @@ namespace HotellApp.Controllers.RoomController
 
             if (result)
             {
-                AnsiConsole.WriteLine($"Statusen för rum {roomId} har ändrats till {newStatus}.");
+                AnsiConsole.MarkupLine($"Statusen för rum [green]{roomId}[/] har ändrats till [green]{newStatus}[]/.");
             }
             else
             {
@@ -224,5 +218,59 @@ namespace HotellApp.Controllers.RoomController
                 AmountOfExtraBeds = amountOfExtraBeds
             };
         }
+        public List<Room> CheckRoomAvailability(TypeOfRoom roomType, DateTime arrivalDate, DateTime departureDate, int amountOfRooms)
+        {
+            var availableRooms = _roomService.GetAvailableRooms(roomType, arrivalDate, departureDate, (sbyte)amountOfRooms);
+            return availableRooms;
+        }
+
+        public void ChangeRoomStatusForBooking(List<Room> rooms, DateTime arrivalDate, DateTime departureDate)
+        {
+            foreach (var room in rooms)
+            {
+                _roomService.ChangeRoomStatusForDateRange(room.RoomId, StatusOfRoom.Reserved, arrivalDate, departureDate);
+            }
+        }
+
+        //public void SearchAvailableRoomsController()
+        //{
+        //    Console.Clear();
+
+        //    // Fråga användaren om kriterier för sökningen
+        //    var roomType = AnsiConsole.Prompt(
+        //        new SelectionPrompt<TypeOfRoom>()
+        //            .Title("Välj rumstyp:")
+        //            .AddChoices(TypeOfRoom.Single, TypeOfRoom.Double));
+
+        //    var arrivalDate = AnsiConsole.Ask<DateTime>("Ange ankomstdatum (yyyy-MM-dd):");
+        //    var departureDate = AnsiConsole.Ask<DateTime>("Ange avresedatum (yyyy-MM-dd):");
+        //    var amountOfRooms = AnsiConsole.Ask<sbyte>("Ange antal rum:");
+
+        //    // Använd `GetAvailableRooms` för att hitta lediga rum
+        //    var availableRooms = _roomService.GetAvailableRooms(roomType, arrivalDate, departureDate, amountOfRooms);
+
+        //    // Visa resultatet
+        //    if (availableRooms.Any())
+        //    {
+        //        AnsiConsole.MarkupLine("[green]Följande rum är lediga:[/]");
+        //        foreach (var room in availableRooms)
+        //        {
+        //            AnsiConsole.MarkupLine($"Rum ID: {room.RoomId}, Typ: {room.RoomType}, Storlek: {room.RoomSize} kvm");
+        //        }
+
+        //        // Låt användaren välja ett rum om så önskas
+        //        var selectedRoomId = AnsiConsole.Prompt(
+        //            new SelectionPrompt<int>()
+        //                .Title("Välj ett rum att boka eller tryck [red]Enter[/red] för att avsluta:")
+        //                .AddChoices(availableRooms.Select(r => r.RoomId)));
+
+        //        Console.WriteLine($"Du valde rum ID: {selectedRoomId}");
+        //    }
+        //    else
+        //    {
+        //        AnsiConsole.MarkupLine("[red]Inga rum matchar din sökning.[/]");
+        //    }
+        //}
+
     }
 }
