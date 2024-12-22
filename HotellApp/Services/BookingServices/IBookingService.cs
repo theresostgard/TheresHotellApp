@@ -27,6 +27,8 @@ namespace HotellApp.Services.BookingServices
         void AddRoomsToBooking(List<BookingRoom> bookingRooms);
 
         //void AddRoomsToBooking(Booking booking, List<Room> selectedRooms, DateTime arrivalDate, DateTime departureDate);
+
+        void UpdateBookingStatus(Booking booking);
     }
 
     

@@ -23,9 +23,21 @@ namespace HotellApp.Services.BookingServices
 
         public void CreateBooking(Booking booking)
         {
-            
+            UpdateBookingStatus(booking);
             _dbContext.Booking.Add(booking);
             _dbContext.SaveChanges();
+        }
+
+        public void UpdateBookingStatus(Booking booking)
+        {
+            if (booking.ArrivalDate < DateTime.Today)
+            {
+                booking.Status = BookingStatus.Inactive;
+            }
+            else
+            {
+                booking.Status = BookingStatus.Active;
+            }
         }
 
         public void AddRoomsToBooking(List<BookingRoom> bookingRooms)

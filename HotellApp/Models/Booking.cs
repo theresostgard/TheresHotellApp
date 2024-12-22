@@ -30,6 +30,8 @@ namespace HotellApp.Models
 
         public ICollection<BookingRoom> BookingRooms { get; set; }
 
+        public BookingStatus Status { get; set; }
+
        
 
     }
