@@ -52,6 +52,7 @@ namespace HotellApp.Utilities.BookingDisplay
             table.AddRow("[yellow]Rumstyp[/]", booking.RoomType.ToString());
             table.AddRow("[yellow]Antal gäster[/]", booking.AmountOfGuests.ToString());
             table.AddRow("[yellow]Antal rum[/]", booking.AmountOfRooms.ToString());
+            table.AddRow("[yellow]Bokningens status[/]", booking.Status.ToString());
 
             return table;
         }
