@@ -1,6 +1,7 @@
 ﻿using HotellApp.Data;
 using HotellApp.Models;
 using HotellApp.Models.Enums;
+using HotellApp.Services.RoomServices;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -54,7 +55,6 @@ namespace HotellApp.Services.BookingServices
                 .ToList();
         }
 
-        // Uppdaterar en bokning
         public void UpdateBooking(int bookingId, Booking updatedBooking)
         {
             var booking = _dbContext.Booking.FirstOrDefault(b => b.BookingId == bookingId);
@@ -75,7 +75,6 @@ namespace HotellApp.Services.BookingServices
             }
         }
 
-        // Tar bort en bokning
         public string DeleteBooking(int id)
         {
             var booking = _dbContext.Booking.FirstOrDefault(b => b.BookingId == id);
@@ -105,6 +104,12 @@ namespace HotellApp.Services.BookingServices
                 .Where(r => r.RoomType == roomType && r.Status == StatusOfRoom.Active)
                 .ToList();
 
+            availableRooms = availableRooms.Where(r => !_dbContext.BookingRoom
+            .Any(br => br.RoomId == r.RoomId &&
+                  ((arrivalDate >= br.Booking.ArrivalDate && arrivalDate <= br.Booking.DepartureDate) ||
+                   (departureDate >= br.Booking.ArrivalDate && departureDate <= br.Booking.DepartureDate))))
+            .ToList();
+
             // Om användaren valde extrasängar för dubbelrum
             if (roomType == TypeOfRoom.Double)
             {
@@ -115,5 +120,7 @@ namespace HotellApp.Services.BookingServices
             // Om det inte finns tillräckligt med rum returnera false
             return availableRooms.Count >= amountOfRooms;
         }
+
+       
     }
 }

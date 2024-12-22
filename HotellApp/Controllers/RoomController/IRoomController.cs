@@ -17,5 +17,6 @@ namespace HotellApp.Controllers.RoomController
         bool ShouldAllowExtraBed(int roomSize, TypeOfRoom roomType);
 
 
+
     }
 }

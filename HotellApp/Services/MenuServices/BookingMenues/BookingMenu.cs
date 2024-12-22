@@ -43,6 +43,7 @@ namespace HotellApp.Services.MenuServices.BookingMenues
             {
                 case "Skapa bokning":
                     _bookingController.CreateBookingController();
+                    Console.ReadKey();
                     break;
                 case "Visa en bokning":
                     _bookingController.ReadBookingController();
@@ -50,17 +51,15 @@ namespace HotellApp.Services.MenuServices.BookingMenues
                 case "Visa alla bokningar":
                     Console.Clear();
                     _bookingController.ReadAllBookingsController();
-    
+                    Console.ReadKey();
                     break;
                 case "Uppdatera bokning":
                     Console.Clear();
                     _bookingController.UpdateBookingController();
-
                     break;
                 case "Radera bokning":
                     Console.Clear();
                     _bookingController.DeleteBookingController();
-   
                     break;
                 case "Tillbaka till huvudmenyn":
      

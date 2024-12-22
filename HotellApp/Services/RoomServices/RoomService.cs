@@ -135,25 +135,25 @@ namespace HotellApp.Services.RoomServices
         public List<Room> GetAvailableRooms(TypeOfRoom roomType, DateTime arrivalDate, DateTime departureDate, sbyte amountOfRooms)
         {
             // Hitta alla rum av den angivna typen
-            var allRooms = _dbContext.Room.Where(r => r.RoomType == roomType).ToList();
+            var allRooms = _dbContext.Room
+                .Where(r => r.RoomType == roomType)
+                .ToList();
 
             // Hitta rummen som är tillgängliga för det angivna datumintervallet
-            var availableRooms = new List<Room>();
-
-            foreach (var room in allRooms)
+            var availableRooms = allRooms.Where(room =>
             {
                 var roomStatuses = _dbContext.RoomStatusHistory
-                    .Where(rsh => rsh.RoomId == room.RoomId && rsh.StartDate < departureDate && (rsh.EndDate == null || rsh.EndDate > arrivalDate))
+                    .Where(rsh => rsh.RoomId == room.RoomId &&
+                                  rsh.StartDate < departureDate &&
+                                  (rsh.EndDate == null || rsh.EndDate > arrivalDate))
                     .ToList();
 
-                // Om rummet inte har några statushistorik som blockerar det under den här perioden, är det tillgängligt
-                if (!roomStatuses.Any())
-                {
-                    availableRooms.Add(room);
-                }
-            }
+                // Här kollar vi om rummet är tillgängligt. Om det inte finns någon status för rummet som blockerar det,
+                // ska det vara tillgängligt.
+                return !roomStatuses.Any();
+            }).ToList();
 
-            return availableRooms.Take(amountOfRooms).ToList();
+            return availableRooms;
         }
 
 

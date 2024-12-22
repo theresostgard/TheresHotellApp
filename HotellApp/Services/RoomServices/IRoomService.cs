@@ -13,5 +13,6 @@ namespace HotellApp.Services.RoomServices
 
         void ChangeRoomStatusForDateRange(int roomId, StatusOfRoom newStatus, DateTime startDate, DateTime endDate);
         List<Room> GetAvailableRooms(TypeOfRoom roomType, DateTime arrivalDate, DateTime departureDate, sbyte amountOfRooms);
+        
     }
 }

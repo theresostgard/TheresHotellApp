@@ -232,5 +232,45 @@ namespace HotellApp.Controllers.RoomController
             }
         }
 
+        //public void SearchAvailableRoomsController()
+        //{
+        //    Console.Clear();
+
+        //    // Fråga användaren om kriterier för sökningen
+        //    var roomType = AnsiConsole.Prompt(
+        //        new SelectionPrompt<TypeOfRoom>()
+        //            .Title("Välj rumstyp:")
+        //            .AddChoices(TypeOfRoom.Single, TypeOfRoom.Double));
+
+        //    var arrivalDate = AnsiConsole.Ask<DateTime>("Ange ankomstdatum (yyyy-MM-dd):");
+        //    var departureDate = AnsiConsole.Ask<DateTime>("Ange avresedatum (yyyy-MM-dd):");
+        //    var amountOfRooms = AnsiConsole.Ask<sbyte>("Ange antal rum:");
+
+        //    // Använd `GetAvailableRooms` för att hitta lediga rum
+        //    var availableRooms = _roomService.GetAvailableRooms(roomType, arrivalDate, departureDate, amountOfRooms);
+
+        //    // Visa resultatet
+        //    if (availableRooms.Any())
+        //    {
+        //        AnsiConsole.MarkupLine("[green]Följande rum är lediga:[/]");
+        //        foreach (var room in availableRooms)
+        //        {
+        //            AnsiConsole.MarkupLine($"Rum ID: {room.RoomId}, Typ: {room.RoomType}, Storlek: {room.RoomSize} kvm");
+        //        }
+
+        //        // Låt användaren välja ett rum om så önskas
+        //        var selectedRoomId = AnsiConsole.Prompt(
+        //            new SelectionPrompt<int>()
+        //                .Title("Välj ett rum att boka eller tryck [red]Enter[/red] för att avsluta:")
+        //                .AddChoices(availableRooms.Select(r => r.RoomId)));
+
+        //        Console.WriteLine($"Du valde rum ID: {selectedRoomId}");
+        //    }
+        //    else
+        //    {
+        //        AnsiConsole.MarkupLine("[red]Inga rum matchar din sökning.[/]");
+        //    }
+        //}
+
     }
 }

@@ -43,6 +43,7 @@ namespace HotellApp.Services.MenuServices.RoomMenues
                     break;
                 case "Visa alla rum":
                     _roomController.ReadAllRoomsController();
+                    Console.ReadKey();
                     break;
                 case "Uppdatera rum":
                     _roomController.UpdateRoomController();
