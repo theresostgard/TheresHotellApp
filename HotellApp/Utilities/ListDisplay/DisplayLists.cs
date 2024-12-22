@@ -40,6 +40,7 @@ namespace HotellApp.Utilities.ListDisplay
             }
             AnsiConsole.Render(table);
 
+            
         }
 
         public void DisplayRooms()
