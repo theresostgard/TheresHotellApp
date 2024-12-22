@@ -3,15 +3,7 @@ using HotellApp.Models.Enums;
 using HotellApp.Services.GuestServices;
 using HotellApp.Utilities.DisplayGuest;
 using HotellApp.Utilities.ListDisplay;
-using Microsoft.EntityFrameworkCore;
 using Spectre.Console;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HotellApp.Controllers.GuestController
 {
@@ -78,20 +70,39 @@ namespace HotellApp.Controllers.GuestController
 
         public void DeleteGuestController()
         {
-            _displayLists.DisplayGuests();
-            var guestId = AnsiConsole.Prompt(
-                new TextPrompt<int>("Ange GästId för den kund du vill radera: "));
+            bool isDeletingGuest = true;
 
-            var confirm = AnsiConsole.Confirm("Är du säker på att du vill radera gästen?");
-            if (!confirm)
+            while (isDeletingGuest)
             {
-                Console.WriteLine("Radering avbruten.");
-                return;
+                _displayLists.DisplayGuests();
+                var guestId = AnsiConsole.Prompt(
+                    new TextPrompt<int>("Ange GästId för den kund du vill radera: "));
+
+                var confirm = AnsiConsole.Confirm("Är du säker på att du vill ta bort gästen?");
+                if (!confirm)
+                {
+                    Console.WriteLine("Radering avbruten.");
+                    return;
+                }
+                else
+                {
+                    var deleteGuestIfPossible = _guestService.DeleteGuest(guestId);
+
+                    AnsiConsole.MarkupLine($"[red]{deleteGuestIfPossible}[/]");
+
+                    var response = AnsiConsole.Prompt(
+                   new SelectionPrompt<string>()
+                       .Title("Vill du ta bort en till gäst?")
+                       .AddChoices("Ja", "Nej"));
+                    Console.Clear();
+
+                    if (response == "Nej")
+                    {
+                        isDeletingGuest = false;
+                    }
+                }
+
             }
-
-            var deleteGuestIfPossible = _guestService.DeleteGuest(guestId);
-
-            AnsiConsole.MarkupLine($"[red]{deleteGuestIfPossible}[/]");
         }
 
         public void ReadAllGuestsController()
@@ -100,13 +111,7 @@ namespace HotellApp.Controllers.GuestController
 
             if (guests != null && guests.Any())
             {
-                foreach (var guest in guests)
-                {
-                    Console.WriteLine($"GästId: {guest.GuestId}\n" +
-                        $"Förnamn: {guest.FirstName}\n" +
-                        $"Efternamn: {guest.LastName}\n" +
-                        $"_______________________________\n");
-                }
+                    _displayLists.DisplayGuests();
             }
             else
             {
@@ -116,33 +121,48 @@ namespace HotellApp.Controllers.GuestController
 
         public void ReadGuestController()
         {
-            _displayLists.DisplayGuests();
+            bool isReadingGuest = true;
 
-            var guestId = AnsiConsole.Prompt(
-                   new TextPrompt<int>("Ange gästens kundnummer: "));
-
-            Console.Clear();
-
-            var guest = _guestService.ReadGuest(guestId);
-
-            if (guest != null)
+            while (isReadingGuest)
             {
-                DisplayGuest.DisplayGuestInformation(guest);
-            }
-            else
-            {
-                AnsiConsole.WriteLine("Gästen kunde inte hittas.\n");
+                _displayLists.DisplayGuests();
 
-                var IsCreatingNewCustomer = AnsiConsole.Prompt(
-                new SelectionPrompt<string>()
-                .Title("Vill du skapa en ny gäst?")
-                .AddChoices("Ja", "Nej"));
-                if (IsCreatingNewCustomer.Trim() == "Ja")
+                var guestId = AnsiConsole.Prompt(
+                new TextPrompt<int>("Ange gästens kundnummer: ")
+                 .Validate(id => id > 0 ? ValidationResult.Success() 
+                 : ValidationResult.Error("[red]Kundnummer måste vara positivt![/]")));
+
+                Console.Clear();
+
+                var guest = _guestService.ReadGuest(guestId);
+
+                if (guest != null)
                 {
-                    Console.Clear();
-                    CreateGuestController();
-                }
+                    DisplayGuest.DisplayGuestInformation(guest);
+                    var continueReading = AnsiConsole.Prompt(
+                    new SelectionPrompt<string>()
+                    .Title("Vill du se en till gästs information?")
+                    .AddChoices("Ja", "Nej"));
 
+                    // Continue or exit the loop
+                    isReadingGuest = continueReading.Trim() == "Ja";
+                }
+                else
+                {
+                    AnsiConsole.WriteLine("Gästen kunde inte hittas.\n");
+
+                    var createNewGuest = AnsiConsole.Prompt(
+                    new SelectionPrompt<string>()
+                    .Title("Vill du skapa en ny gäst?")
+                    .AddChoices("Ja", "Nej"));
+                    if (createNewGuest.Trim() == "Ja")
+                    {
+                        Console.Clear();
+                        CreateGuestController();
+                    }
+
+                }
+                Console.Clear();
             }
 
         }
@@ -176,6 +196,7 @@ namespace HotellApp.Controllers.GuestController
                     new SelectionPrompt<string>()
                         .Title("Vill du uppdatera en till gäst?")
                         .AddChoices("Ja", "Nej"));
+                    
                     Console.Clear();
                     
                     if (response == "Nej")
@@ -340,11 +361,13 @@ namespace HotellApp.Controllers.GuestController
             updatedTable.AddRow("E-post", guestEmailAdress);
             updatedTable.AddRow("Status", statusOfGuest.ToString());
 
+            
             AnsiConsole.Write(new Panel(updatedTable)
                 .BorderColor(Color.Green)
                 .Header("[bold yellow]Uppdaterad gästinformation[/]")
                 .Expand());
 
+            Console.ReadKey();
             return new Guest
             {
                 GuestId = currentGuestData.GuestId,

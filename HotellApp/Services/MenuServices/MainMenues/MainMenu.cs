@@ -75,7 +75,7 @@ namespace HotellApp.Services.MenuServices.MainMenues
 
                     break;
             }
-            Console.ReadKey();
+           
         }
     }
 }

@@ -243,19 +243,76 @@ namespace HotellApp.Controllers.BookingController
 
         public void UpdateBookingController()
         {
-
-            var id = AnsiConsole.Ask<int>("Ange bokningsnummer för att uppdatera bokning:");
-            var booking = new Booking
+            bool isUpdatingBooking = true;
+            while (isUpdatingBooking)
             {
-                BookingId = id,
-                ArrivalDate = AnsiConsole.Ask<DateTime>("Nytt ankomstdatum (yyyy-MM-dd):"),
-                DepartureDate = AnsiConsole.Ask<DateTime>("Nytt avresedatum (yyyy-MM-dd):"),
-                RoomType = AnsiConsole.Ask<TypeOfRoom>("Önskad rumstyp: Enkelrum (1), Dubbelrum (2):"),
-                AmountOfGuests = AnsiConsole.Ask<sbyte>("Antal gäster:"),
-                AmountOfRooms = AnsiConsole.Ask<sbyte>("Antal rum:")
-            };
+                _displayLists.DisplayBookings();
 
-            _bookingService.UpdateBooking(id, booking);
+                var bookingId = AnsiConsole.Ask<int>("Ange bokningsnummer för att uppdatera bokning:");
+                var currentBooking = _bookingService.ReadBooking(bookingId);
+
+                if (currentBooking == null) 
+                {
+                    AnsiConsole.MarkupLine("[red]Bokningen kunde inte hittas.[/]");
+                }
+                else
+                {
+                    var updatedBooking = GetBookingDetailsFromUser(currentBooking);
+
+                    _bookingService.UpdateBooking(bookingId, updatedBooking);
+                    AnsiConsole.MarkupLine("[green]Bokningen har uppdaterats![/]");
+                }
+                var continueUpdating = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                .Title("Vill du uppdatera en till bokning?")
+                .AddChoices("Ja", "Nej"));
+
+                isUpdatingBooking = continueUpdating == "Ja";
+            }
+        }
+
+        public Booking GetBookingDetailsFromUser(Booking currentBooking)
+        {
+            // Hämta och validera ankomstdatum
+            var arrivalDate = AnsiConsole.Prompt(
+                new TextPrompt<DateTime>($"Nuvarande ankomstdatum: {currentBooking.ArrivalDate:yyyy-MM-dd}.\nAnge nytt ankomstdatum (yyyy-MM-dd):")
+                    .ValidationErrorMessage("[red]Ogiltigt datum. Datumet måste vara från idag eller senare.[/]")
+                    .Validate(date => date >= DateTime.Today ? ValidationResult.Success() : ValidationResult.Error("[red]Ankomstdatum måste vara idag eller senare![/]")));
+
+            // Hämta och validera avresedatum
+            var departureDate = AnsiConsole.Prompt(
+                new TextPrompt<DateTime>($"Nuvarande avresedatum: {currentBooking.DepartureDate:yyyy-MM-dd}.\nAnge nytt avresedatum (yyyy-MM-dd):")
+                    .ValidationErrorMessage("[red]Ogiltigt datum. Avresedatum måste vara efter ankomstdatum.[/]")
+                    .Validate(date => date > arrivalDate ? ValidationResult.Success() : ValidationResult.Error("[red]Avresedatum måste vara efter ankomstdatum![/]")));
+
+            // Hämta och uppdatera rumstyp
+            var roomType = AnsiConsole.Prompt(
+                new SelectionPrompt<TypeOfRoom>()
+                    .Title($"Nuvarande rumstyp: {currentBooking.RoomType}. Välj ny rumstyp:")
+                    .AddChoices(TypeOfRoom.Single, TypeOfRoom.Double));
+
+            // Hämta och validera antal gäster
+            var amountOfGuests = AnsiConsole.Prompt(
+                new TextPrompt<sbyte>($"Nuvarande antal gäster: {currentBooking.AmountOfGuests}. Ange nytt antal gäster:")
+                    .ValidationErrorMessage("[red]Antalet gäster måste vara minst 1![/]")
+                    .Validate(guests => guests > 0 ? ValidationResult.Success() : ValidationResult.Error("[red]Antalet gäster måste vara större än 0![/]")));
+
+            // Hämta och validera antal rum
+            var amountOfRooms = AnsiConsole.Prompt(
+                new TextPrompt<sbyte>($"Nuvarande antal rum: {currentBooking.AmountOfRooms}. Ange nytt antal rum:")
+                    .ValidationErrorMessage("[red]Antalet rum måste vara minst 1![/]")
+                    .Validate(rooms => rooms > 0 ? ValidationResult.Success() : ValidationResult.Error("[red]Antalet rum måste vara större än 0![/]")));
+
+            // Returnera uppdaterad bokning
+            return new Booking
+            {
+                BookingId = currentBooking.BookingId,
+                ArrivalDate = arrivalDate,
+                DepartureDate = departureDate,
+                RoomType = roomType,
+                AmountOfGuests = amountOfGuests,
+                AmountOfRooms = amountOfRooms
+            };
         }
 
         public void DeleteBookingController()

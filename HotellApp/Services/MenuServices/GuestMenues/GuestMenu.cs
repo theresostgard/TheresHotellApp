@@ -45,12 +45,10 @@ namespace HotellApp.Services.MenuServices.GuestMenu
                 case "Skapa ny gäst":
                     Console.Clear();
                     _guestController.CreateGuestController();
-                    Console.ReadKey();
                     break;
                 case "Visa en gäst":
                     Console.Clear();
                     _guestController.ReadGuestController();
-                    Console.ReadKey();
                     break;
                 case "Visa alla gäster":
                     Console.Clear();
@@ -59,13 +57,11 @@ namespace HotellApp.Services.MenuServices.GuestMenu
                     break;
                 case "Uppdatera gäst":
                     Console.Clear();
-                    _guestController.UpdateGuestController();
-                    Console.ReadKey();
+                    _guestController.UpdateGuestController(); 
                     break;
                 case "Ta bort gäst":
                     Console.Clear();
-                    _guestController.DeleteGuestController();
-                    Console.ReadKey();
+                    _guestController.DeleteGuestController();    
                     break;
                 case "Tillbaka till huvudmenyn":
                     Console.WriteLine("Tillbaka till huvudmenyn...");
@@ -74,8 +70,7 @@ namespace HotellApp.Services.MenuServices.GuestMenu
                     Console.WriteLine("Ogiltigt val.");
                     break;
             }
-            Console.WriteLine("\nTryck på valfri tangent för att fortsätta...");
-            Console.ReadKey();
+ 
 
         }
 
