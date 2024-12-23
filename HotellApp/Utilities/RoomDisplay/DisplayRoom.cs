@@ -28,7 +28,7 @@ namespace HotellApp.Utilities.RoomDisplay
 
             table.AddRow("[yellow]RumsNr[/]", room.RoomId.ToString());
             table.AddRow("[yellow]Rumstyp[/]", room.RoomType.ToString());
-            table.AddRow("[yellow]Rumsstorlek[/]", room.RoomSize.ToString());
+            table.AddRow("[yellow]Rumsstorlek (kvm)[/]", room.RoomSize.ToString());
             table.AddRow("[yellow]Extrasängar tillåtet?[/]", room.IsExtraBedAllowed.ToString());
             table.AddRow("[yellow]Antal extrasängar (om tillåtet)[/]", room.AmountOfExtraBeds.ToString());
             table.AddRow("[yellow]Status[/]", room.Status.ToString());

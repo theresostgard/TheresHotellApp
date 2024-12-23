@@ -28,6 +28,7 @@ namespace HotellApp.Controllers.RoomController
         }
         public void CreateRoomController()
         {
+            Console.Clear();
             AnsiConsole.WriteLine("Skapa nytt rum:\n\n");
             // Välj rumstyp
             var roomType = AnsiConsole.Prompt(

@@ -59,7 +59,7 @@ namespace HotellApp.Controllers.BookingCreationController
             var amountOfGuests = AnsiConsole.Ask<sbyte>("Antal gäster: ");
             var amountOfRooms = AnsiConsole.Ask<sbyte>("Antal rum: ");
 
-            int amountOfExtraBeds = 0;
+            var amountOfExtraBeds = 0;
 
             // Fråga om extrasängar om rummet är av typen Double
             if (roomType == TypeOfRoom.Double)
@@ -72,7 +72,10 @@ namespace HotellApp.Controllers.BookingCreationController
 
                 if (isExtraBedWanted)
                 {
-                    amountOfExtraBeds = AnsiConsole.Ask<int>("Hur många extrasängar önskas?");
+                    amountOfExtraBeds = AnsiConsole.Prompt(
+                         new SelectionPrompt<int>()
+                         .Title("Hur många extrasängar önskas?")
+                         .AddChoices(1, 2));
                 }
             }
             return (roomType, amountOfGuests, amountOfRooms, amountOfExtraBeds);
@@ -114,14 +117,14 @@ namespace HotellApp.Controllers.BookingCreationController
             var table = new Table();
             table.AddColumn("Rum #");
             table.AddColumn("Typ");
-            table.AddColumn("Status");
+            //table.AddColumn("Status");
             table.AddColumn("Storlek");
 
             foreach (var room in availableRooms.Where(r => r.Status == StatusOfRoom.Active))
             {
                 table.AddRow(room.RoomId.ToString(),
                     room.RoomType.ToString(),
-                    room.Status.ToString(),
+                    //room.Status.ToString(),
                     room.RoomSize.ToString());
             }
 
@@ -129,14 +132,12 @@ namespace HotellApp.Controllers.BookingCreationController
         }
         public List<Room> SelectRooms(List<Room> availableRooms, sbyte amountOfRooms)
         {
+            var activeRooms = availableRooms.Where(r => r.Status == StatusOfRoom.Active).ToList();
             return AnsiConsole.Prompt(
                 new MultiSelectionPrompt<Room>()
                     .Title("Välj de rum du vill boka:")
-                    .AddChoices(availableRooms)
-                    .UseConverter(room => $"{room.RoomId} - " +
-                    $"{room.RoomType} " +
-                    $"({room.RoomSize}m², " +
-                    $"{room.Status})"))
+                    .AddChoices(activeRooms)
+                    .UseConverter(room => $"# {room.RoomId}"))
                     .Take(amountOfRooms)
                     .ToList();
         }
