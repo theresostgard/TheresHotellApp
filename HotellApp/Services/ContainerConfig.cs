@@ -26,6 +26,7 @@ using HotellApp.Utilities.DisplayGuest;
 using HotellApp.Utilities.BookingDisplay;
 using HotellApp.Utilities.RoomDisplay;
 using HotellApp.Controllers.BookingCreationController;
+using HotellApp.Utilities.GuestDisplay;
 
 
 namespace HotellApp.Services
@@ -63,9 +64,11 @@ namespace HotellApp.Services
             // Registrera ServiceFactory
             builder.RegisterType<HotellApp.Services.ServiceFactorys.ServiceFactory>().As<IServiceFactory>().InstancePerLifetimeScope();
 
+            //Utilities
             builder.RegisterType<DisplayLists>().As<IDisplayLists>().InstancePerLifetimeScope();
             builder.RegisterType<DisplayBooking>().As<IDisplayBooking>().InstancePerLifetimeScope();
             builder.RegisterType<DisplayRoom>().As<IDisplayRoom>().InstancePerLifetimeScope();
+            builder.RegisterType<DisplayGuest>().As<IDisplayGuest>().InstancePerLifetimeScope();
 
            
 

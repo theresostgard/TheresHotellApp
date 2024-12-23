@@ -19,7 +19,7 @@ namespace HotellApp.Controllers.GuestController
         int GetLatestGuestId();
         (GuestType, int?) SelectCustomerType();
 
-        Guest GetGuestDetailsFromUser(Guest currentGuestData);
+        Guest UpdateGuestDetails(Guest currentGuestData);
 
     }
 }

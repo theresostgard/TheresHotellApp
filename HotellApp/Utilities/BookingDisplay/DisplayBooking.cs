@@ -108,6 +108,8 @@ namespace HotellApp.Utilities.BookingDisplay
 
             table.AddRow("[yellow]Boknings-ID[/]", booking.BookingId.ToString());
             table.AddRow("[yellow]Ankomstdatum[/]", booking.ArrivalDate.ToString("yyyy-MM-dd"));
+            table.AddRow("[yellow]Gästens namn[/]", booking.Guest.FirstName.ToString() + " " + booking.Guest.LastName.ToString());
+            table.AddRow("[yellow]GästId[/]", booking.GuestId.ToString());
             table.AddRow("[yellow]Avresedatum[/]", booking.DepartureDate.ToString("yyyy-MM-dd"));
             table.AddRow("[yellow]Rumstyp[/]", booking.RoomType.ToString());
             table.AddRow("[yellow]Antal gäster[/]", booking.AmountOfGuests.ToString());
