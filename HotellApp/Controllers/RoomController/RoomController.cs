@@ -49,12 +49,17 @@ namespace HotellApp.Controllers.RoomController
             var isExtraBedAllowed = ShouldAllowExtraBed(newRoomSize, roomType);
 
             // Fråga om antal extrasängar om det är tillåtet
-            var amountOfExtraBeds = isExtraBedAllowed
-                ? AnsiConsole.Prompt(
-                    new SelectionPrompt<AmountOfExtraBedsAllowedInRoom>()
-                        .Title("Hur många extrasängar ska tillåtas?")
-                        .AddChoices(AmountOfExtraBedsAllowedInRoom.One, AmountOfExtraBedsAllowedInRoom.Two))
-                : AmountOfExtraBedsAllowedInRoom.None;
+            var amountOfExtraBeds = AmountOfExtraBedsAllowedInRoom.None;
+
+            if (isExtraBedAllowed)
+            {
+                amountOfExtraBeds = newRoomSize > 35
+                    ? AnsiConsole.Prompt(
+                        new SelectionPrompt<AmountOfExtraBedsAllowedInRoom>()
+                            .Title("Hur många extrasängar ska tillåtas?")
+                            .AddChoices(AmountOfExtraBedsAllowedInRoom.One, AmountOfExtraBedsAllowedInRoom.Two))
+                    : AmountOfExtraBedsAllowedInRoom.One; // För rum 15–35 kvm, max 1 extrasäng
+            }
             // Skapa rummet och lägg till det via tjänsten
             var room = new Room
             {
@@ -67,18 +72,26 @@ namespace HotellApp.Controllers.RoomController
 
             AnsiConsole.WriteLine($"Nytt rum skapades med rumsnr: {room.RoomId}\n" +
                 $"Rumstyp: {room.RoomType}\nStorlek: {room.RoomSize} kvm.");
+            Console.ReadKey();
         }
 
         public bool ShouldAllowExtraBed(int roomSize, TypeOfRoom roomType)
         {
-            if (roomSize > 15 && roomType == TypeOfRoom.Double)
+            if (roomType == TypeOfRoom.Double)
             {
-                return AnsiConsole.Prompt(
-                    new SelectionPrompt<string>()
-                        .Title("Rummet är tillräckligt stort för att ha en extrasäng. Vill du tillåta det?")
-                        .AddChoices("1 = Ja", "2 = Nej")) == "1 = Ja";
+                if (roomSize > 15 && roomSize < 35)
+                {
+                    return AnsiConsole.Prompt(
+                        new SelectionPrompt<string>()
+                            .Title("Rummet är tillräckligt stort för att ha en extrasäng. Vill du tillåta det?")
+                            .AddChoices("Ja", "Nej")) == "1 = Ja";
+                }
+                else if (roomSize > 35)
+                {
+                    return true; 
+                }
             }
-            return false;
+            return false; 
         }
 
         public void ReadRoomController()
@@ -161,7 +174,7 @@ namespace HotellApp.Controllers.RoomController
 
             if (result)
             {
-                AnsiConsole.MarkupLine($"Statusen för rum [green]{roomId}[/] har ändrats till [green]{newStatus}[]/.");
+                AnsiConsole.MarkupLine($"Statusen för rum [green]{roomId}[/] har ändrats till [green]{newStatus}[/].");
             }
             else
             {
@@ -231,45 +244,7 @@ namespace HotellApp.Controllers.RoomController
             }
         }
 
-        //public void SearchAvailableRoomsController()
-        //{
-        //    Console.Clear();
 
-        //    // Fråga användaren om kriterier för sökningen
-        //    var roomType = AnsiConsole.Prompt(
-        //        new SelectionPrompt<TypeOfRoom>()
-        //            .Title("Välj rumstyp:")
-        //            .AddChoices(TypeOfRoom.Single, TypeOfRoom.Double));
-
-        //    var arrivalDate = AnsiConsole.Ask<DateTime>("Ange ankomstdatum (yyyy-MM-dd):");
-        //    var departureDate = AnsiConsole.Ask<DateTime>("Ange avresedatum (yyyy-MM-dd):");
-        //    var amountOfRooms = AnsiConsole.Ask<sbyte>("Ange antal rum:");
-
-        //    // Använd `GetAvailableRooms` för att hitta lediga rum
-        //    var availableRooms = _roomService.GetAvailableRooms(roomType, arrivalDate, departureDate, amountOfRooms);
-
-        //    // Visa resultatet
-        //    if (availableRooms.Any())
-        //    {
-        //        AnsiConsole.MarkupLine("[green]Följande rum är lediga:[/]");
-        //        foreach (var room in availableRooms)
-        //        {
-        //            AnsiConsole.MarkupLine($"Rum ID: {room.RoomId}, Typ: {room.RoomType}, Storlek: {room.RoomSize} kvm");
-        //        }
-
-        //        // Låt användaren välja ett rum om så önskas
-        //        var selectedRoomId = AnsiConsole.Prompt(
-        //            new SelectionPrompt<int>()
-        //                .Title("Välj ett rum att boka eller tryck [red]Enter[/red] för att avsluta:")
-        //                .AddChoices(availableRooms.Select(r => r.RoomId)));
-
-        //        Console.WriteLine($"Du valde rum ID: {selectedRoomId}");
-        //    }
-        //    else
-        //    {
-        //        AnsiConsole.MarkupLine("[red]Inga rum matchar din sökning.[/]");
-        //    }
-        //}
 
     }
 }

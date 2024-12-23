@@ -15,27 +15,7 @@ namespace HotellApp.Utilities.RoomDisplay
         {
             var table = CreateRoomTable(room, "Rumsinformation", Color.Green);
             AnsiConsole.Write(table);
-            //if (room != null)
-            //{
-            //    var roomInfo = new Markup($"[yellow]RumsId:[/] [red]{room.RoomId}[/]\n" +
-            //                            $"[yellow]Rumstyp:[/] {room.RoomType}\n" +
-            //                            $"[yellow]Storlek:[/] {room.RoomSize}\n" +
-            //                            $"[yellow]Är extrasäng tillåtet:[/] {room.IsExtraBedAllowed}\n" +
-            //                            $"[yellow]Antal extrasängar:[/] {room.AmountOfExtraBeds}\n" +
-            //                            $"[yellow]Status på rummet:[/] {room.Status}");
-
-            //    // Visa ramat information i en Box
-            //    AnsiConsole.Write(
-            //        new Panel(roomInfo)
-            //            .BorderColor(Color.Green) // Färg på ramen
-            //            .Header($" Rumsinformation ") // Lägg till header
-            //            .Border(BoxBorder.Double) // dubbel ram
-            //    );
-            //}
-            //else
-            //{
-            //    AnsiConsole.MarkupLine("[red]Inget rum med det rumsId:t hittades.[/]");
-            //}
+   
         }
 
         public Table CreateRoomTable(Room room, string header, Color borderColor)
@@ -110,33 +90,7 @@ namespace HotellApp.Utilities.RoomDisplay
             }
         }
 
-        //public static void RenderTable(List<Booking> bookings, int currentPage, int pageSize)
-        //{
-        //    var table = new Table();
-        //    table.AddColumn("[Green]Boknings-ID[/]");
-        //    table.AddColumn("[Green]Gästnamn[/]");
-        //    table.AddColumn("[Green]Ankomstdatum[/]");
-        //    table.AddColumn("[Green]Avresedatum[/]");
-        //    table.AddColumn("[Green]Rumstyp[/]");
 
-        //    int start = currentPage * pageSize;
-        //    int end = Math.Min(start + pageSize, bookings.Count);
-
-        //    for (int i = start; i < end; i++)
-        //    {
-        //        var booking = bookings[i];
-        //        var guestName = booking.Guest != null ? $"{booking.Guest.FirstName} {booking.Guest.LastName}" : "Ingen gäst kopplad";
-        //        table.AddRow(
-        //            booking.BookingId.ToString(),
-        //            guestName,
-        //            booking.ArrivalDate.ToString("yyyy-MM-dd"),
-        //            booking.DepartureDate.ToString("yyyy-MM-dd"),
-        //            booking.RoomType.ToString()
-        //        );
-        //    }
-
-        //    AnsiConsole.Write(table);
-        //}
         public static void DisplayTable(Table table)
         {
             AnsiConsole.Write(table);

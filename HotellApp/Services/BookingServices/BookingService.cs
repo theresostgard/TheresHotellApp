@@ -125,8 +125,9 @@ namespace HotellApp.Services.BookingServices
             // Om användaren valde extrasängar för dubbelrum
             if (roomType == TypeOfRoom.Double)
             {
+                
                 // Kontrollera om det finns rum med tillräckligt utrymme för extrasängar
-                availableRooms = availableRooms.Where(r => r.RoomSize >= 15).ToList();
+                availableRooms = availableRooms.Where(r => r.RoomSize >= 15 && r.RoomSize < 35).ToList();
             }
 
             // Om det inte finns tillräckligt med rum returnera false
