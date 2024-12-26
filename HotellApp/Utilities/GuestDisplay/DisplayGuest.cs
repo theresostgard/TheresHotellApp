@@ -13,6 +13,8 @@ namespace HotellApp.Utilities.DisplayGuest
     {
         public void DisplayGuestInformation(Guest guest)
         {
+            Console.Clear();
+            AnsiConsole.MarkupLine("\n[bold green]Sammanfattning av gästinformation:[/]");
             if (guest != null)
             {
                 var guestInfo = new Markup($"[yellow]GästId:[/] [red]{guest.GuestId}[/]\n" +

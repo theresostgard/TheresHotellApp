@@ -40,7 +40,7 @@ namespace HotellApp.Controllers.BookingController
         public void CreateBookingController()
         {
             Console.Clear();
-            var (guestType, guestId) = _guestController.SelectCustomerType();
+            var (guestType, guestId) = _guestController.SelectGuestType();
 
             if (guestId == null)
             {

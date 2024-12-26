@@ -27,6 +27,7 @@ using HotellApp.Utilities.BookingDisplay;
 using HotellApp.Utilities.RoomDisplay;
 using HotellApp.Controllers.BookingCreationController;
 using HotellApp.Utilities.GuestDisplay;
+using HotellApp.Controllers.GuestInputValidatingControllers;
 
 
 namespace HotellApp.Services
@@ -57,7 +58,7 @@ namespace HotellApp.Services
             builder.RegisterType<RoomController>().As<IRoomController>().InstancePerLifetimeScope();
             builder.RegisterType<InvoiceController>().As<IInvoiceController>().InstancePerLifetimeScope();
             builder.RegisterType<BookingCreationController>().As<IBookingCreationController>().InstancePerLifetimeScope();
-
+            builder.RegisterType<GuestInputValidatingController>().As<IGuestInputValidatingController>().InstancePerLifetimeScope();
             // Registrera DataInitializer för att hantera seedning och migrering
             builder.RegisterType<DataInitializer>().As<IDataInitializer>().SingleInstance();
 

@@ -100,23 +100,23 @@ namespace HotellApp.Services.GuestServices
             }
         }
 
-        public int GetLatestGuestId()
-        {
+        //public int GetLatestGuestId()
+        //{
            
-                var latestGuest = _dbContext.Guest
-                    .OrderByDescending(g => g.GuestId)
-                    .FirstOrDefault();
+        //        var latestGuest = _dbContext.Guest
+        //            .OrderByDescending(g => g.GuestId)
+        //            .FirstOrDefault();
 
-                if (latestGuest == null)
-                {
-                    Console.WriteLine("Inga gäster finns i databasen.");
-                    return 0;
-                }
+        //        if (latestGuest == null)
+        //        {
+        //            Console.WriteLine("Inga gäster finns i databasen.");
+        //            return 0;
+        //        }
 
-                return latestGuest.GuestId;
+        //        return latestGuest.GuestId;
             
 
-        }
+        //}
 
 
     }

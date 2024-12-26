@@ -16,10 +16,10 @@ namespace HotellApp.Controllers.GuestController
 
         void ReadAllGuestsController();
         void DeleteGuestController();
-        int GetLatestGuestId();
-        (GuestType, int?) SelectCustomerType();
+       // int GetLatestGuestId();
+        (GuestType, int?) SelectGuestType();
 
-        Guest UpdateGuestDetails(Guest currentGuestData);
+        //Guest UpdateGuestDetails(Guest currentGuestData);
 
     }
 }

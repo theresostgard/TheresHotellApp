@@ -1,4 +1,5 @@
-﻿using HotellApp.Models;
+﻿using HotellApp.Controllers.GuestInputValidatingControllers;
+using HotellApp.Models;
 using HotellApp.Models.Enums;
 using HotellApp.Services.GuestServices;
 using HotellApp.Utilities.DisplayGuest;
@@ -13,15 +14,18 @@ namespace HotellApp.Controllers.GuestController
         private readonly IGuestService _guestService;
         private readonly IDisplayLists _displayLists;
         private readonly IDisplayGuest _displayGuest;
+        private readonly IGuestInputValidatingController _guestInputValidatingController;
 
 
         public GuestController(IGuestService guestService,
-            IDisplayLists displayLists, IDisplayGuest displayGuest
+            IDisplayLists displayLists, IDisplayGuest displayGuest,
+            IGuestInputValidatingController guestInputValidatingController
             )
         {
             _guestService = guestService;
             _displayLists = displayLists;
             _displayGuest = displayGuest;
+            _guestInputValidatingController = guestInputValidatingController;
         }
         public void CreateGuestController()
         {
@@ -30,18 +34,19 @@ namespace HotellApp.Controllers.GuestController
 
             var guest = new Guest
             {
-                FirstName = ValidateName("Ange [yellow]förnamn[/]:", "[red]Namnet får inte vara tomt![/]"),
-                LastName = ValidateName("Ange [yellow]efternamn[/]:", "[red]Namnet får inte vara tomt![/]"),
-                PhoneNumber = ValidatePhoneNumber(),
-                EmailAdress = ValidateEmailAddress(),
+                FirstName = _guestInputValidatingController.ValidateNameNewGuest(
+                    "Ange [yellow]förnamn[/]:", 
+                    "[red]Namnet måste bestå av minst två tecken![/]"),
+                LastName = _guestInputValidatingController.ValidateNameNewGuest(
+                    "Ange [yellow]efternamn[/]:", 
+                    "[red]Namnent måste bestå av minst två tecken![/]"),
+                PhoneNumber = _guestInputValidatingController.ValidatePhoneNumberNewGuest(),
+                EmailAdress = _guestInputValidatingController.ValidateEmailAddressNewGuest(),
                 GuestStatus = GuestStatus.Active
             };
 
             var createdGuest = _guestService.CreateGuest(guest);
 
-            Console.Clear();
-            AnsiConsole.MarkupLine("\n[bold green]Sammanfattning av gästinformation:[/]");
-       
             _displayGuest.DisplayGuestInformation(createdGuest);
 
             bool confirm = AnsiConsole.Confirm("\nÄr alla uppgifter korrekta?");
@@ -178,7 +183,7 @@ namespace HotellApp.Controllers.GuestController
                 }
                 else
                 {
-                    var updatedGuest = UpdateGuestDetails(currentGuestData);
+                    var updatedGuest = _guestInputValidatingController.UpdateGuestDetails(currentGuestData);
 
                     _guestService.UpdateGuest(guestId, updatedGuest);
                     //AnsiConsole.MarkupLine($"Gäst med gästId [green]{guestId}[/] har uppdaterats.");
@@ -200,15 +205,8 @@ namespace HotellApp.Controllers.GuestController
            
         }
 
-        public int GetLatestGuestId()
-        {
 
-            var latestGuest = _guestService.GetLatestGuestId();
-            Console.WriteLine(latestGuest);
-            return latestGuest;
-        }
-
-        public (GuestType, int?) SelectCustomerType()
+        public (GuestType, int?) SelectGuestType()
         {
             GuestType guestType;
             int? guestId = null;
@@ -237,7 +235,7 @@ namespace HotellApp.Controllers.GuestController
             {
                 Console.WriteLine("Skapa ny kund:");
                 CreateGuestController();
-                guestId = GetLatestGuestId();
+                //guestId = GetLatestGuestId();
             }
             // Handle ExistingGuest selection
             else if (guestType == GuestType.ExistingGuest)
@@ -272,91 +270,6 @@ namespace HotellApp.Controllers.GuestController
             return (guestType, guestId);
         }
 
-      
-
-        private string ValidateName(string prompt, string errorMessage)
-        {
-            return AnsiConsole.Prompt(
-                new TextPrompt<string>(prompt)
-                    .ValidationErrorMessage(errorMessage)
-                    .Validate(input => !string.IsNullOrWhiteSpace(input) && input.Length >= 2));
-        }
-
-        private string ValidatePhoneNumber()
-        {
-            return AnsiConsole.Prompt(
-                new TextPrompt<string>("Ange [yellow]telefonnummer[/]:")
-                    .ValidationErrorMessage("[red]Telefonnumret måste vara numeriskt![/]")
-                    .Validate(input => long.TryParse(input, out _) && input.Length >= 10));
-        }
-
-        private string ValidateEmailAddress()
-        {
-            return AnsiConsole.Prompt(
-                new TextPrompt<string>("Ange [yellow]e-post[/]:")
-                    .ValidationErrorMessage("[red]Ogiltig e-postadress!\nEn e-mailadress måste innehålla ett @ och en punkt![/]")
-                    .Validate(input =>
-                    System.Text.RegularExpressions.Regex.IsMatch(input, @"^[^@\s]+@[^@\s]+\.[^@\s]+$")));
-
-        }
-
-        public Guest UpdateGuestDetails(Guest currentGuestData)
-        {
-            Console.Clear();
-            AnsiConsole.MarkupLine("[bold green]Befintlig gästinformation:[/]");
-
-            _displayGuest.DisplayGuestInformation(currentGuestData);
-
-            //AnsiConsole.MarkupLine("[gray]Om du vill behålla det befintliga värdet, tryck bara på[/] [green]Enter.[/]");
-
-            var guestFirstName = ValidateName(
-                $"Förnamn ([blue]{currentGuestData.FirstName}[/]): ",
-                "[red]Namnet får inte vara tomt!");
-        
-            var guestLastName = ValidateName(
-                $"Efternamn ([blue]{currentGuestData.LastName}[/]): ",
-                "[red]Namnet får inte vara tomt!");
-         
-            var guestPhoneNumber = ValidatePhoneNumber();
-         
-            var guestEmailAdress = ValidateEmailAddress();
-          
-
-            var statusOfGuest = AnsiConsole.Prompt(
-                new SelectionPrompt<GuestStatus>()
-                    .Title("Välj ny status på gäst:")
-                    .HighlightStyle("cyan")
-                    .AddChoices(GuestStatus.Active, GuestStatus.Inactive));
-
-            Console.Clear();
-            AnsiConsole.MarkupLine("\n[bold green]Sammanfattning av uppdaterad gästinformation:[/]");
-            //var updatedTable = new Table()
-            //    .AddColumn("[red]Fält[/]")
-            //    .AddColumn("[red]Ny information[/]");
-            //updatedTable.AddRow("Förnamn", guestFirstName);
-            //updatedTable.AddRow("Efternamn", guestLastName);
-            //updatedTable.AddRow("Telefonnummer", guestPhoneNumber);
-            //updatedTable.AddRow("E-post", guestEmailAdress);
-            //updatedTable.AddRow("Status", statusOfGuest.ToString());
-
-            //AnsiConsole.Write(new Panel(updatedTable)
-            //    .BorderColor(Color.Green)
-            //    .Header("[bold yellow]Uppdaterad gästinformation[/]")
-            //    .Expand());
-            _displayGuest.DisplayGuestInformation(currentGuestData);
-
-            Console.ReadKey();
-
-            return new Guest
-            {
-                GuestId = currentGuestData.GuestId,
-                FirstName = guestFirstName,
-                LastName = guestLastName,
-                PhoneNumber = guestPhoneNumber,
-                EmailAdress = guestEmailAdress,
-                GuestStatus = statusOfGuest
-            };
-        }
 
     }
 }
