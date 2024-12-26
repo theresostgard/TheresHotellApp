@@ -1,4 +1,5 @@
 ﻿using HotellApp.Models;
+using HotellApp.Models.Enums;
 using Spectre.Console;
 using System;
 using System.Collections.Generic;
@@ -10,120 +11,146 @@ namespace HotellApp.Utilities.BookingDisplay
 {
     public class DisplayBooking : IDisplayBooking
     {
-        public static void DisplayBookingInformation(Booking booking)
-        {
-            if (booking != null)
-            {
-                var bookingInfo = new Markup($"[yellow]BokningsNr:[/] [red]{booking.BookingId}[/]\n" +
-                                        $"[yellow]GästId:[/] {booking.GuestId}\n" +
-                                        $"[yellow]Ankomstdag:[/] {booking.ArrivalDate}\n" +
-                                        $"[yellow]Avresedag:[/] {booking.DepartureDate}\n" +
-                                        $"[yellow]Rumstyp:[/] {booking.RoomType}\n" +
-                                        $"[yellow]Antal gäster:[/] {booking.AmountOfGuests}\n" +
-                                        $"[yellow]Antal extrasängar: [/] {booking.AmountOfExtraBeds}\n" +
-                                        $"[yellow]Antal rum: [/] {booking.AmountOfRooms}\n" +
-                                        $"[yellow]Bokningens status: [/] {booking.Status}");
 
-                // Visa ramat information i en Box
-                AnsiConsole.Write(
-                    new Panel(bookingInfo)
-                        .BorderColor(Color.Green) // Färg på ramen
-                        .Header($" Bokningsinformation ") // Lägg till header
-                        .Border(BoxBorder.Double) // dubbel ram
-                );
-            }
-            else
+
+        public void DisplayBookingInformation(Booking booking)
+        {
+            var table = CreateBookingTable(booking, "Bokningsinformation", Color.Green);
+            AnsiConsole.Write(table);
+        }
+
+ 
+        public void Pagination(List<Booking> bookings)
+        {
+            var pageSize = 2; // Antal bokningar per sida
+            var totalPages = (int)Math.Ceiling(bookings.Count / (double)pageSize);
+            var currentPage = 1;
+
+            while (true)
             {
-                AnsiConsole.MarkupLine("[red]Ingen bokning funnen.[/]");
+                Console.Clear();
+                AnsiConsole.MarkupLine($"[bold yellow]Sida {currentPage}/{totalPages}[/]");
+
+                var bookingsToDisplay = bookings
+                    .Skip((currentPage - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+
+                foreach (var booking in bookingsToDisplay)
+                {
+                    DisplayBookingInformation(booking);
+                }
+
+                AnsiConsole.MarkupLine("[green]Använd pil-tangenter för att navigera. Tryck på [/][red]Esc[/] [green]för att avsluta.[/]");
+                var key = Console.ReadKey(true).Key;
+
+                if (key == ConsoleKey.RightArrow)
+                {
+                    if (currentPage < totalPages)
+                    {
+                        currentPage++;
+                    }
+                    else
+                    {
+                        currentPage = 1; // Börja om på första sidan
+                    }
+                }
+                else if (key == ConsoleKey.LeftArrow && currentPage > 1)
+                {
+                    currentPage--;
+                }
+                else if (key == ConsoleKey.Escape)
+                {
+                    break; // Avsluta programmet
+                }
             }
         }
 
-        public Table CreateBookingTable(Booking booking, string tableTitle, Color borderColor)
+        public void DisplayRoomsForBooking(Booking booking)
+        {
+            if (booking.BookingRooms == null || !booking.BookingRooms.Any())
+            {
+                AnsiConsole.MarkupLine("[red]Inga rum kopplade till denna bokning.[/]");
+                return;
+            }
+
+            foreach (var bookingRoom in booking.BookingRooms)
+            {
+                if (bookingRoom.Room != null)
+                {
+                    var room = bookingRoom.Room;
+                    var roomInfo = new Markup($"[yellow]RumsNr:[/] {room.RoomId}\n" +
+                                               $"[yellow]Rumstyp:[/] {room.RoomType}\n" +
+                                               $"[yellow]Storlek:[/] {room.RoomSize} kvm");
+
+                    AnsiConsole.Write(
+                        new Panel(roomInfo)
+                            .BorderColor(Color.Red)
+                            .Header($"Bokningsnr {booking.BookingId}")
+                            .Border(BoxBorder.Square)
+                    );
+                }
+                else
+                {
+                    AnsiConsole.MarkupLine("[red]Rum kopplat till bokningen saknas.[/]");
+                }
+            }
+        }
+        public Table CreateBookingTable(Booking booking, string header, Color borderColor)
         {
             var table = new Table()
                 .BorderColor(borderColor)
-                .Border(TableBorder.Double);
+                .Border(TableBorder.Double)
+                .Title(header);
+
             table.AddColumn(new TableColumn("Egenskap").Width(20));
             table.AddColumn(new TableColumn("Information").Width(30));
 
             table.AddRow("[yellow]Boknings-ID[/]", booking.BookingId.ToString());
             table.AddRow("[yellow]Ankomstdatum[/]", booking.ArrivalDate.ToString("yyyy-MM-dd"));
+            table.AddRow("[yellow]Gästens namn[/]", booking.Guest.FirstName.ToString() + " " + booking.Guest.LastName.ToString());
+            table.AddRow("[yellow]GästId[/]", booking.GuestId.ToString());
             table.AddRow("[yellow]Avresedatum[/]", booking.DepartureDate.ToString("yyyy-MM-dd"));
             table.AddRow("[yellow]Rumstyp[/]", booking.RoomType.ToString());
             table.AddRow("[yellow]Antal gäster[/]", booking.AmountOfGuests.ToString());
             table.AddRow("[yellow]Antal rum[/]", booking.AmountOfRooms.ToString());
-            table.AddRow("[yellow]Bokningens status[/]", booking.Status.ToString());
+            table.AddRow("[yellow]Status på bokningen[/]", booking.Status.ToString());
 
             return table;
         }
 
-        public static void Pagination(List<Booking> bookings)
+        public static void DisplayTable(Table table)
         {
-            int pageSize = 10; // Antal bokningar per sida
-            int currentPage = 0;
-            int totalPages = (int)Math.Ceiling(bookings.Count / (double)pageSize);
-
-            while (true)
-            {
-                Console.Clear();
-
-                // Hämta bokningar för aktuell sida
-                var bookingsToDisplay = bookings.Skip(currentPage * pageSize).Take(pageSize).ToList();
-
-                // Rendera bokningar på aktuell sida
-                foreach (var booking in bookingsToDisplay)
-                {
-                    var guestName = booking.Guest != null ? $"{booking.Guest.FirstName} {booking.Guest.LastName}" : "Ingen gäst kopplad";
-                    DisplayBooking.DisplayBookingInformation(booking);
-                }
-
-                // Visa sidinformation och navigering
-                AnsiConsole.MarkupLine($"\nSida [yellow]{currentPage + 1}[/] av [green]{totalPages}[/]");
-                AnsiConsole.MarkupLine("[blue]◄[/] Föregående sida   [blue]►[/] Nästa sida");
-                AnsiConsole.MarkupLine("[red]Esc[/]: Avsluta");
-
-                var key = Console.ReadKey(true).Key;
-
-                switch (key)
-                {
-                    case ConsoleKey.RightArrow:
-                        if (currentPage < totalPages - 1) currentPage++;
-                        break;
-                    case ConsoleKey.LeftArrow:
-                        if (currentPage > 0) currentPage--;
-                        break;
-                    case ConsoleKey.Escape:
-                        return; // Avsluta programmet
-                }
-            }
-        }
-
-        public static void RenderTable(List<Booking> bookings, int currentPage, int pageSize)
-        {
-            var table = new Table();
-            table.AddColumn("[Green]Boknings-ID[/]");
-            table.AddColumn("[Green]Gästnamn[/]");
-            table.AddColumn("[Green]Ankomstdatum[/]");
-            table.AddColumn("[Green]Avresedatum[/]");
-            table.AddColumn("[Green]Rumstyp[/]");
-
-            int start = currentPage * pageSize;
-            int end = Math.Min(start + pageSize, bookings.Count);
-
-            for (int i = start; i < end; i++)
-            {
-                var booking = bookings[i];
-                var guestName = booking.Guest != null ? $"{booking.Guest.FirstName} {booking.Guest.LastName}" : "Ingen gäst kopplad";
-                table.AddRow(
-                    booking.BookingId.ToString(),
-                    guestName,
-                    booking.ArrivalDate.ToString("yyyy-MM-dd"),
-                    booking.DepartureDate.ToString("yyyy-MM-dd"),
-                    booking.RoomType.ToString()
-                );
-            }
-
             AnsiConsole.Write(table);
         }
+
+        public void ShowCurrentBooking(Booking currentBooking)
+        {
+            var currentBookingTable = CreateBookingTable(currentBooking, "Nuvarande bokningsinformation", Color.Aqua);
+            AnsiConsole.Write(currentBookingTable);
+        }
+
+        public void ShowUpdatedBookingSummary(Booking currentBooking, DateTime arrivalDate, DateTime departureDate, TypeOfRoom roomType, sbyte amountOfGuests, sbyte amountOfRooms)
+        {
+            AnsiConsole.MarkupLine("\n[bold green]Sammanfattning av uppdaterad bokning:[/]");
+
+            var updatedTable = new Table()
+                .BorderColor(Color.Green)
+                .Border(TableBorder.Double);
+            updatedTable.AddColumn(new TableColumn("Egenskap").Width(20));
+            updatedTable.AddColumn(new TableColumn("Ny information").Width(30));
+
+            updatedTable.AddRow("[red]Boknings-ID[/]", currentBooking.BookingId.ToString());
+            updatedTable.AddRow("[red]Ankomstdatum[/]", arrivalDate.ToString("yyyy-MM-dd"));
+            updatedTable.AddRow("[red]Avresedatum[/]", departureDate.ToString("yyyy-MM-dd"));
+            updatedTable.AddRow("[red]Rumstyp[/]", roomType.ToString());
+            updatedTable.AddRow("[red]Antal gäster[/]", amountOfGuests.ToString());
+            updatedTable.AddRow("[red]Antal rum[/]", amountOfRooms.ToString());
+
+            AnsiConsole.Write(updatedTable);
+        }
+
     }
 }
+
+ 

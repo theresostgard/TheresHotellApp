@@ -9,6 +9,6 @@ namespace HotellApp.Services.GuestServices
         List<Guest> GetAllGuests();
         void UpdateGuest(int id, Guest updatedGuest);
         string DeleteGuest(int id);
-        int GetLatestGuestId();
+       // int GetLatestGuestId();
     }
 }

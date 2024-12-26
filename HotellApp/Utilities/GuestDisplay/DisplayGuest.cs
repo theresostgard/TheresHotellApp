@@ -1,4 +1,5 @@
 ﻿using HotellApp.Models;
+using HotellApp.Utilities.GuestDisplay;
 using Spectre.Console;
 using System;
 using System.Collections.Generic;
@@ -8,10 +9,12 @@ using System.Threading.Tasks;
 
 namespace HotellApp.Utilities.DisplayGuest
 {
-    public class DisplayGuest
+    public class DisplayGuest : IDisplayGuest
     {
-        public static void DisplayGuestInformation(Guest guest)
+        public void DisplayGuestInformation(Guest guest)
         {
+            Console.Clear();
+            AnsiConsole.MarkupLine("\n[bold green]Sammanfattning av gästinformation:[/]");
             if (guest != null)
             {
                 var guestInfo = new Markup($"[yellow]GästId:[/] [red]{guest.GuestId}[/]\n" +
