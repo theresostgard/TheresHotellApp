@@ -61,12 +61,12 @@ namespace HotellApp.Controllers.GuestInputValidatingControllers
             AnsiConsole.MarkupLine("[gray]Om du vill behålla det befintliga värdet, tryck bara på[/] [green]Enter.[/]");
 
             var guestFirstName = ValidateNameExistingGuest(
-                $"Förnamn ([blue]{currentGuestData.FirstName}[/]): ",
+                $"Förnamn: ",
                 "[red]Namnet måste innehålla minst 2 tecken![/]",
                 currentGuestData.FirstName);
 
             var guestLastName = ValidateNameExistingGuest(
-                $"Efternamn ([blue]{currentGuestData.LastName}[/]): ",
+                $"Efternamn: ",
                 "[red]Namnet måste innehålla minst 2 tecken![/]",
                 currentGuestData.LastName);
 
@@ -102,7 +102,7 @@ namespace HotellApp.Controllers.GuestInputValidatingControllers
         public string ValidateEmailAddressExistingGuest(string currentEmail)
         {
             return AnsiConsole.Prompt(
-                new TextPrompt<string>("Ange [yellow]e-post[/]:")
+                new TextPrompt<string>("E-post:")
                     .AllowEmpty() // Tillåt tom inmatning
                     .DefaultValue(currentEmail) // Använd det befintliga värdet om tomt
                     .ValidationErrorMessage("[red]Ogiltig e-postadress!\nEn e-mailadress måste innehålla ett @ och en punkt![/]")
@@ -114,7 +114,7 @@ namespace HotellApp.Controllers.GuestInputValidatingControllers
         public string ValidatePhoneNumberExistingGuest(string currentPhoneNumber)
         {
             return AnsiConsole.Prompt(
-                new TextPrompt<string>("Ange [yellow]telefonnummer[/]:")
+                new TextPrompt<string>("Telefonnummer:")
                     .AllowEmpty() // Tillåt tom inmatning
                     .DefaultValue(currentPhoneNumber) // Använd det befintliga värdet om tomt
                     .ValidationErrorMessage("[red]Telefonnumret måste vara numeriskt och innehålla minst 10 siffror![/]")

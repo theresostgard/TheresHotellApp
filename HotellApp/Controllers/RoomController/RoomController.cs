@@ -160,6 +160,8 @@ namespace HotellApp.Controllers.RoomController
 
         public void DeleteRoomController()
         {
+            Console.Clear();
+            _displayLists.DisplayRooms();
 
             // Få in rumsnummer för det rum som ska ändras
             var roomId = AnsiConsole.Ask<int>("Ange rumsnummer för det rum du vill ändra status på: ");
@@ -176,10 +178,12 @@ namespace HotellApp.Controllers.RoomController
             if (result)
             {
                 AnsiConsole.MarkupLine($"Statusen för rum [green]{roomId}[/] har ändrats till [green]{newStatus}[/].");
+                Console.ReadKey();
             }
             else
             {
                 AnsiConsole.WriteLine("Statusändringen misslyckades.");
+                Console.ReadKey();
             }
         }
 

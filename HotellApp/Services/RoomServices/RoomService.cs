@@ -79,7 +79,6 @@ namespace HotellApp.Services.RoomServices
                 // Uppdatera statusen på rummet istället för att ta bort det
                 room.Status = newStatus;
                 _dbContext.SaveChanges();
-                Console.WriteLine($"Statusen för rum med RoomId {roomId} har ändrats till {newStatus}.");
                 return true;
             }
             else
