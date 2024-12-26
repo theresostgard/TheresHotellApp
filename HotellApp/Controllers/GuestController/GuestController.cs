@@ -103,16 +103,18 @@ namespace HotellApp.Controllers.GuestController
 
         public void ReadAllGuestsController()
         {
-            var guests = _guestService.GetAllGuests();
+            //var guests = _guestService.GetAllGuests();
 
-            if (guests != null && guests.Any())
-            {
-                    _displayLists.DisplayGuests();
-            }
-            else
-            {
-                Console.WriteLine("Inga gäster finns registrerade.");
-            }
+            //if (guests != null && guests.Any())
+            //{
+            //        _displayLists.DisplayGuests();
+            //}
+            //else
+            //{
+            //    Console.WriteLine("Inga gäster finns registrerade.");
+            //}
+
+            _displayLists.DisplayGuests();
         }
 
         public void ReadGuestController()

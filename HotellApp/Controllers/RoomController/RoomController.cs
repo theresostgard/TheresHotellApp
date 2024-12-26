@@ -145,7 +145,8 @@ namespace HotellApp.Controllers.RoomController
 
         public void UpdateRoomController()
         {
-         
+            Console.Clear();
+            _displayLists.DisplayRooms();
             var roomId = AnsiConsole.Ask<int>("Ange rumsnummer för rummet du vill uppdatera:");
 
             var currentRoom = _roomService.ReadRoom(roomId); 
