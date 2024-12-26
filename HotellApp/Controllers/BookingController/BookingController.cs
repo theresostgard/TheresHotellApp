@@ -73,16 +73,28 @@ namespace HotellApp.Controllers.BookingController
             _bookingCreationController.ShowAvailableRooms(availableRooms);
 
             // Steg 6: Låt användaren välja rum
-            var selectedRooms = _bookingCreationController.SelectRooms(availableRooms, amountOfRooms);
+            List<Room> selectedRooms = new List<Room>();
+            bool isValidSelection = false;
 
-            if (selectedRooms.Count < amountOfRooms)
+            while (!isValidSelection)
             {
-                AnsiConsole.MarkupLine($"\n[yellow]Välj minst {amountOfRooms} rum.[/]");
-                return;
+                selectedRooms = _bookingCreationController.SelectRooms(availableRooms, amountOfRooms);
+
+                // Kontrollera om användaren har valt rätt antal rum
+                if (selectedRooms.Count == amountOfRooms)
+                {
+                    isValidSelection = true;
+                }
+                else
+                {
+                    AnsiConsole.MarkupLine($"\n[yellow]Du måste välja exakt {amountOfRooms} rum. Försök igen.[/]");
+                }
             }
 
+
             // Steg 7: Skapa bokning
-            var booking = _bookingCreationController.CreateBooking(guestId.Value,
+            var booking = _bookingCreationController.CreateBooking(
+                guestId.Value,
                 arrivalDate,
                 departureDate,
                 roomType,
@@ -90,10 +102,11 @@ namespace HotellApp.Controllers.BookingController
                 selectedRooms.Count);
 
             // Steg 8: Koppla rummen till bokningen och uppdatera rumsstatus
-            _bookingCreationController.AssignRoomsToBooking(selectedRooms,
-                                booking,
-                                arrivalDate,
-                                departureDate);
+            _bookingCreationController.AssignRoomsToBooking(
+                selectedRooms,
+                booking,
+                arrivalDate,
+                departureDate);
 
             AnsiConsole.WriteLine($"Ny bokning skapad med bokningsnr {booking.BookingId}.");
 
@@ -252,8 +265,10 @@ namespace HotellApp.Controllers.BookingController
         public void DeleteBookingController()
         {
             //visa lista med bokningar och datum så man vet vad man kan välja 
+            _displayLists.DisplayBookings();
             var id = AnsiConsole.Ask<int>("Ange bokningsnummer för den bokning du vill radera:");
 
+            
             var confirm = AnsiConsole.Confirm("Är du säker på att du vill radera bokningen?");
             if (!confirm)
             {
@@ -266,6 +281,7 @@ namespace HotellApp.Controllers.BookingController
 
             // Visa resultatet till användaren
             AnsiConsole.MarkupLine($"[yellow]{result}[/]");
+            Console.ReadKey();
         }
 
 

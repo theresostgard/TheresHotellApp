@@ -133,13 +133,21 @@ namespace HotellApp.Controllers.BookingCreationController
         public List<Room> SelectRooms(List<Room> availableRooms, sbyte amountOfRooms)
         {
             var activeRooms = availableRooms.Where(r => r.Status == StatusOfRoom.Active).ToList();
-            return AnsiConsole.Prompt(
-                new MultiSelectionPrompt<Room>()
-                    .Title("Välj de rum du vill boka:")
-                    .AddChoices(activeRooms)
-                    .UseConverter(room => $"# {room.RoomId}"))
-                    .Take(amountOfRooms)
-                    .ToList();
+            var selectedRooms = AnsiConsole.Prompt(
+            new MultiSelectionPrompt<Room>()
+             .Title($"Välj {amountOfRooms} rum att boka:")
+             .AddChoices(activeRooms)
+             .UseConverter(room => $"# {room.RoomId} ({room.RoomType})"))
+             .ToList();
+
+            // Kontrollera att användaren har valt exakt det antal rum
+            if (selectedRooms.Count != amountOfRooms)
+            {
+                Console.Clear();
+                return new List<Room>();  // Retur av en tom lista för att indikera ett ogiltigt val
+            }
+
+            return selectedRooms;  // Retur av de valda rummen om antalet matchar
         }
         public Booking CreateBooking(int guestId,
             DateTime arrivalDate,
