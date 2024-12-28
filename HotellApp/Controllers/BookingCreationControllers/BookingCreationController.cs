@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using HotellApp.Services.BookingServices;
 using HotellApp.Services.RoomServices;
+using Microsoft.EntityFrameworkCore;
 
 namespace HotellApp.Controllers.BookingCreationController
 {
@@ -149,6 +150,8 @@ namespace HotellApp.Controllers.BookingCreationController
 
             return selectedRooms;  // Retur av de valda rummen om antalet matchar
         }
+
+       
         public Booking CreateBooking(int guestId,
             DateTime arrivalDate,
             DateTime departureDate,

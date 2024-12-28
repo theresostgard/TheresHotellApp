@@ -14,6 +14,8 @@ namespace HotellApp.Models
 
         public StatusOfRoom Status { get; set; } = StatusOfRoom.Active;
 
+        public decimal PricePerNight { get; set; }
+
         public ICollection<BookingRoom>? BookingRooms { get; set; }
 
     }

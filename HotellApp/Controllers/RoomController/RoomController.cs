@@ -54,7 +54,7 @@ namespace HotellApp.Controllers.RoomController
 
             if (isExtraBedAllowed)
             {
-                amountOfExtraBeds = newRoomSize > 35
+                amountOfExtraBeds = newRoomSize > 30
                     ? AnsiConsole.Prompt(
                         new SelectionPrompt<AmountOfExtraBedsAllowedInRoom>()
                             .Title("Hur många extrasängar ska tillåtas?")
@@ -80,14 +80,14 @@ namespace HotellApp.Controllers.RoomController
         {
             if (roomType == TypeOfRoom.Double)
             {
-                if (roomSize > 15 && roomSize < 35)
+                if (roomSize > 15 && roomSize < 30)
                 {
                     return AnsiConsole.Prompt(
                         new SelectionPrompt<string>()
                             .Title("Rummet är tillräckligt stort för att ha en extrasäng. Vill du tillåta det?")
                             .AddChoices("Ja", "Nej")) == "1 = Ja";
                 }
-                else if (roomSize > 35)
+                else if (roomSize > 30)
                 {
                     return true; 
                 }
@@ -157,6 +157,7 @@ namespace HotellApp.Controllers.RoomController
             // Uppdatera rummet via tjänsten
             _roomService.UpdateRoom(roomId, updatedRoom);
             AnsiConsole.MarkupLine($"Rummet med ID [green]{roomId}[/] har uppdaterats.");
+            Console.ReadKey();
         }
 
         public void DeleteRoomController()
@@ -190,6 +191,7 @@ namespace HotellApp.Controllers.RoomController
 
         public Room GetRoomDetailsFromUser(Room currentRoom)
         {
+            Console.Clear();
            
             var roomType = AnsiConsole.Prompt(
                 new SelectionPrompt<TypeOfRoom>()
@@ -199,41 +201,79 @@ namespace HotellApp.Controllers.RoomController
             
             var roomSize = AnsiConsole.Ask<int>($"Nuvarande storlek: {currentRoom.RoomSize} kvm.\nAnge ny storlek:");
 
-            
-            bool canHaveExtraBed = roomSize >= 15;
 
-            
+            bool canHaveExtraBed = roomSize >= 15 && currentRoom?.RoomType == TypeOfRoom.Double; // Endast dubbelrum kan ha extrasäng
+
             var isExtraBedAllowed = false;
+
             if (canHaveExtraBed)
             {
                 isExtraBedAllowed = AnsiConsole.Prompt(
                     new SelectionPrompt<string>()
-                          .Title($"Nuvarande status för extrasäng: {(currentRoom?.IsExtraBedAllowed
-                          .GetValueOrDefault() ?? false ? "Ja" : "Nej")}. Tillåta extrasäng?")
+                        .Title($"Nuvarande status för extrasäng: {(currentRoom?.IsExtraBedAllowed.GetValueOrDefault() ?? false ? "Ja" : "Nej")}. Tillåta extrasäng?")
                         .AddChoices("Ja", "Nej")) == "Ja";
             }
             else
             {
-                
-                AnsiConsole.WriteLine("Rummet är för litet för att tillåta extrasäng.");
+                if (currentRoom?.RoomType != TypeOfRoom.Double)
+                {
+                    AnsiConsole.WriteLine("Extrasäng är endast tillåtet för dubbelrum.");
+                }
+                else
+                {
+                    AnsiConsole.WriteLine("Rummet är för litet för att tillåta extrasäng.");
+                }
             }
 
-            
-            var amountOfExtraBeds = isExtraBedAllowed
-                ? AnsiConsole.Prompt(
-                    new SelectionPrompt<AmountOfExtraBedsAllowedInRoom>()
-                        .Title($"Nuvarande antal extrasängar: {currentRoom?.AmountOfExtraBeds
-                        .ToString() ?? "0"}. Hur många extrasängar?")
-                        .AddChoices(AmountOfExtraBedsAllowedInRoom.One, AmountOfExtraBedsAllowedInRoom.Two))
-                : AmountOfExtraBedsAllowedInRoom.None;
+            AmountOfExtraBedsAllowedInRoom amountOfExtraBeds = AmountOfExtraBedsAllowedInRoom.None;
+            if (isExtraBedAllowed)
+            {
+                // Kontrollera om rummet är tillräckligt stort för att rymma två extrasängar
+                if (roomSize >= 15 && roomSize <= 30)
+                {
+                    amountOfExtraBeds = AnsiConsole.Prompt(
+                        new SelectionPrompt<AmountOfExtraBedsAllowedInRoom>()
+                            .Title($"Nuvarande antal extrasängar: {currentRoom?.AmountOfExtraBeds
+                            .ToString() ?? "0"}. Hur många extrasängar?")
+                            .AddChoices(AmountOfExtraBedsAllowedInRoom.One));
+                }
+                else if (roomSize > 30)
+                {
+                    amountOfExtraBeds = AnsiConsole.Prompt(
+                        new SelectionPrompt<AmountOfExtraBedsAllowedInRoom>()
+                            .Title($"Nuvarande antal extrasängar: {currentRoom?.AmountOfExtraBeds
+                            .ToString() ?? "0"}. Hur många extrasängar?")
+                            .AddChoices(AmountOfExtraBedsAllowedInRoom.One, AmountOfExtraBedsAllowedInRoom.Two));
+                }
+                else
+                {
+                    AnsiConsole.WriteLine("Rummet är för litet för att tillåta två extrasängar.");
+                }
+            }
 
-            
+            AnsiConsole.MarkupLine($"[yellow]Nuvarande pris per natt: {currentRoom.PricePerNight} kr[/]");
+
+            // Be om det nya priset och validera det
+            decimal pricePerNight = AnsiConsole.Prompt(
+                new TextPrompt<decimal>("Ange det nya priset per natt för rummet:")
+                    .Validate(value =>
+                    {
+                        if (value <= 0)
+                        {
+                            return ValidationResult.Error("Priset måste vara ett positivt tal.");
+                        }
+                        return ValidationResult.Success();
+                    })
+            );
+
+
             return new Room
             {
                 RoomType = roomType,
                 RoomSize = roomSize,
                 IsExtraBedAllowed = isExtraBedAllowed,
-                AmountOfExtraBeds = amountOfExtraBeds
+                AmountOfExtraBeds = amountOfExtraBeds,
+                PricePerNight = pricePerNight
             };
         }
         public List<Room> CheckRoomAvailability(TypeOfRoom roomType, DateTime arrivalDate, DateTime departureDate, int amountOfRooms)
@@ -250,7 +290,7 @@ namespace HotellApp.Controllers.RoomController
             }
         }
 
-
+       
 
     }
 }

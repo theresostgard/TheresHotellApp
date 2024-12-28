@@ -51,6 +51,7 @@ namespace HotellApp.Services.RoomServices
                 room.RoomSize = updatedRoom.RoomSize;
                 room.IsExtraBedAllowed = updatedRoom.IsExtraBedAllowed;
                 room.AmountOfExtraBeds = updatedRoom.AmountOfExtraBeds;
+                room.PricePerNight = updatedRoom.PricePerNight;
                 
 
                 _dbContext.SaveChanges();
