@@ -76,3 +76,22 @@ WHERE
     AND r.Status = 'Active'
 GROUP BY 
     r.RoomSize;
+
+
+
+USE TheresHotell
+SELECT 
+r.RoomId AS 'RumsNr',
+r.RoomType AS 'Rumsstyp',
+r.RoomSize AS 'Rumsstorlek',
+r.IsExtraBedAllowed AS 'Tillåtet med extrasäng?',
+r.AmountOfExtraBeds AS 'Antal extrasängar tillåtet',
+r.Status AS 'Rummets status'
+FROM Room r
+SELECT RoomType, COUNT(*) AS 'AntalRum'
+FROM Room
+GROUP BY 
+RoomType
+ORDER BY
+RoomType
+

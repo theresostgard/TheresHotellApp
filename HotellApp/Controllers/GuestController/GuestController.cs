@@ -188,7 +188,20 @@ namespace HotellApp.Controllers.GuestController
                     var updatedGuest = _guestInputValidatingController.UpdateGuestDetails(currentGuestData);
 
                     _guestService.UpdateGuest(guestId, updatedGuest);
-                    //AnsiConsole.MarkupLine($"Gäst med gästId [green]{guestId}[/] har uppdaterats.");
+                    
+                    bool confirm = AnsiConsole.Confirm("\nÄr alla uppgifter korrekta?");
+
+                    if (confirm)
+                    {
+                        AnsiConsole.MarkupLine($"Gäst med gästId [green]{guestId}[/] har uppdaterats.");
+                        Console.ReadKey();
+                    }
+                    else
+                    {
+                        AnsiConsole.MarkupLine("[bold red]Registrering avbruten.[/]");
+                        Console.ReadKey();
+                    }
+                    
 
                     var response = AnsiConsole.Prompt(
                     new SelectionPrompt<string>()
