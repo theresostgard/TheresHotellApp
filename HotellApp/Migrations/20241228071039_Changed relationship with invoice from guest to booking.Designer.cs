@@ -4,6 +4,7 @@ using HotellApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HotellApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241228071039_Changed relationship with invoice from guest to booking")]
+    partial class Changedrelationshipwithinvoicefromguesttobooking
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -133,6 +136,9 @@ namespace HotellApp.Migrations
                     b.Property<DateTime>("DueDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("GuestId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("InvoiceDate")
                         .HasColumnType("datetime2");
 
@@ -142,6 +148,8 @@ namespace HotellApp.Migrations
                     b.HasKey("InvoiceId");
 
                     b.HasIndex("BookingId");
+
+                    b.HasIndex("GuestId");
 
                     b.ToTable("Invoice");
                 });
@@ -241,6 +249,10 @@ namespace HotellApp.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("HotellApp.Models.Guest", null)
+                        .WithMany("Invoices")
+                        .HasForeignKey("GuestId");
+
                     b.Navigation("Booking");
                 });
 
@@ -263,6 +275,8 @@ namespace HotellApp.Migrations
             modelBuilder.Entity("HotellApp.Models.Guest", b =>
                 {
                     b.Navigation("Bookings");
+
+                    b.Navigation("Invoices");
                 });
 
             modelBuilder.Entity("HotellApp.Models.Room", b =>

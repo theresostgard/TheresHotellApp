@@ -14,8 +14,8 @@ namespace HotellApp.Models
         public DateTime DueDate { get; set; }
         public bool IsPaid { get; set; }
 
-        public int GuestId {  get; set; }
+        public int BookingId {  get; set; }
 
-        public Guest Guest { get; set; }
+        public Booking Booking { get; set; }
     }
 }
