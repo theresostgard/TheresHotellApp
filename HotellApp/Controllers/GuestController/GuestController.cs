@@ -187,12 +187,14 @@ namespace HotellApp.Controllers.GuestController
                 {
                     var updatedGuest = _guestInputValidatingController.UpdateGuestDetails(currentGuestData);
 
-                    _guestService.UpdateGuest(guestId, updatedGuest);
+                   
+                    _displayGuest.DisplayGuestInformation(updatedGuest);
                     
                     bool confirm = AnsiConsole.Confirm("\nÄr alla uppgifter korrekta?");
 
                     if (confirm)
                     {
+                        _guestService.UpdateGuest(guestId, updatedGuest);
                         AnsiConsole.MarkupLine($"Gäst med gästId [green]{guestId}[/] har uppdaterats.");
                         Console.ReadKey();
                     }
@@ -215,9 +217,7 @@ namespace HotellApp.Controllers.GuestController
                         keepAsking = false;
                     }
                 }
-            }
-
-           
+            } 
         }
 
 
@@ -226,14 +226,12 @@ namespace HotellApp.Controllers.GuestController
             GuestType guestType;
             int? guestId = null;
 
-
             while (true)
             {
                 guestType = AnsiConsole.Prompt(
                     new SelectionPrompt<GuestType>()
-                    .Title("Är det en ny eller befintlig gäst? ")
-                    .AddChoices(GuestType.NewGuest, GuestType.ExistingGuest));
-
+                        .Title("Är det en ny eller befintlig gäst? ")
+                        .AddChoices(GuestType.NewGuest, GuestType.ExistingGuest));
 
                 if (guestType == GuestType.NewGuest || guestType == GuestType.ExistingGuest)
                 {
@@ -250,40 +248,49 @@ namespace HotellApp.Controllers.GuestController
             {
                 Console.WriteLine("Skapa ny kund:");
                 CreateGuestController();
-                //guestId = GetLatestGuestId();
+                // guestId = GetLatestGuestId(); // Om du har en metod för att hämta det senaste ID:t
             }
             // Handle ExistingGuest selection
             else if (guestType == GuestType.ExistingGuest)
             {
                 _displayLists.DisplayGuests();
-                // Om användaren väljer befintlig kund, fråga efter kundnummer
-                Console.WriteLine("Ange gästens kundnummer: ");
-                guestId = int.TryParse(Console.ReadLine(), out var id) ? id : (int?)null;
 
-                if (guestId.HasValue)
+                while (true) // Loop för att låta användaren försöka igen
                 {
-                    var existingGuest = _guestService.ReadGuest(guestId.Value); // Kolla om gästen finns i databasen
+                    Console.WriteLine("Ange gästens kundnummer: ");
+                    guestId = int.TryParse(Console.ReadLine(), out var id) ? id : (int?)null;
 
-                    if (existingGuest == null)
+                    if (guestId.HasValue)
                     {
-                        Console.WriteLine("Det angivna kundnumret kunde inte hittas.");
-                        // Här kan vi lägga till ett alternativ att skapa en ny kund om det behövs
+                        var existingGuest = _guestService.ReadGuest(guestId.Value); // Kolla om gästen finns i databasen
+
+                        if (existingGuest == null)
+                        {
+                            Console.WriteLine("Det angivna kundnumret kunde inte hittas.");
+                            if (!AnsiConsole.Confirm("Vill du försöka igen?"))
+                            {
+                                // Avbryt om användaren inte vill försöka igen
+                                return (guestType, null);
+                            }
+                        }
+                        else
+                        {
+                            Console.Clear();
+                            Console.WriteLine($"Gäst funnen: {existingGuest.FirstName} {existingGuest.LastName}");
+                            break; // Avsluta loopen om en gäst hittades
+                        }
                     }
                     else
                     {
-                        Console.Clear();
-                        Console.WriteLine($"Gäst funnen: {existingGuest.FirstName} {existingGuest.LastName}");
+                        Console.WriteLine("Ogiltigt kundnummer. Försök igen.");
                     }
-                }
-                else
-                {
-                    Console.WriteLine("Ogiltigt kundnummer. Försök igen.");
                 }
             }
 
             // Return the selected guest type and the associated guest ID
             return (guestType, guestId);
         }
+
 
 
     }

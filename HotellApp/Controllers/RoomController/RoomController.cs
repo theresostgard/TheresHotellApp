@@ -146,48 +146,99 @@ namespace HotellApp.Controllers.RoomController
         public void UpdateRoomController()
         {
             Console.Clear();
-            _displayLists.DisplayRooms();
-            var roomId = AnsiConsole.Ask<int>("Ange rumsnummer för rummet du vill uppdatera:");
 
-            var currentRoom = _roomService.ReadRoom(roomId); 
+            bool continueUpdatingRooms = true;
 
-            // Hämta nya detaljer om rummet
-            var updatedRoom = GetRoomDetailsFromUser(currentRoom);
-            
-            // Uppdatera rummet via tjänsten
-            _roomService.UpdateRoom(roomId, updatedRoom);
-            AnsiConsole.MarkupLine($"Rummet med ID [green]{roomId}[/] har uppdaterats.");
-            Console.ReadKey();
+            while (continueUpdatingRooms) // Loop för att låta användaren uppdatera flera rum
+            {
+                Console.Clear();
+                _displayLists.DisplayRooms();
+                
+                var roomId = AnsiConsole.Ask<int>("Ange rumsnummer för rummet du vill uppdatera:");
+
+                // Hämta rummet från databasen
+                var currentRoom = _roomService.ReadRoom(roomId);
+
+                if (currentRoom == null)
+                {
+                    // Om rummet inte hittas
+                    AnsiConsole.MarkupLine("[red]Inget rum med det rumsnumret kunde hittas![/]");
+                    if (!AnsiConsole.Confirm("Vill du försöka igen?"))
+                    {
+                        // Avbryt om användaren inte vill försöka igen
+                        return;
+                    }
+                }
+                else
+                {
+                    // Hämta nya detaljer om rummet
+                    var updatedRoom = GetRoomDetailsFromUser(currentRoom);
+
+                    // Uppdatera rummet via tjänsten
+                    _roomService.UpdateRoom(roomId, updatedRoom);
+
+                    AnsiConsole.MarkupLine($"[green]Rummet med ID {roomId} har uppdaterats.[/]");
+                }
+
+                // Fråga om användaren vill uppdatera ett till rum
+                continueUpdatingRooms = AnsiConsole.Confirm("Vill du uppdatera ett till rum?");
+            }
         }
-
-        public void DeleteRoomController()
+        public void ChangeStatusOnRoomController()
         {
             Console.Clear();
-            _displayLists.DisplayRooms();
 
-            // Få in rumsnummer för det rum som ska ändras
-            var roomId = AnsiConsole.Ask<int>("Ange rumsnummer för det rum du vill ändra status på: ");
+            bool continueChangingStatus = true;
 
-            // Fråga användaren om vilken status de vill sätta på rummet
-            var newStatus = AnsiConsole.Prompt(
-                new SelectionPrompt<StatusOfRoom>()
-                    .Title("Välj den nya statusen på rummet: ")
-                    .AddChoices(StatusOfRoom.Active, StatusOfRoom.InActive, StatusOfRoom.UnderMaintenance));
-
-            // Försök att ändra statusen på rummet
-            var result = _roomService.DeleteRoom(roomId, newStatus);
-
-            if (result)
+            while (continueChangingStatus) // Loop för att låta användaren ändra status på flera rum
             {
-                AnsiConsole.MarkupLine($"Statusen för rum [green]{roomId}[/] har ändrats till [green]{newStatus}[/].");
-                Console.ReadKey();
-            }
-            else
-            {
-                AnsiConsole.WriteLine("Statusändringen misslyckades.");
-                Console.ReadKey();
+                Console.Clear();
+                _displayLists.DisplayRooms();
+
+                // Hämta rumsnummer för det rum som ska ändras
+                var roomId = AnsiConsole.Ask<int>("Ange rumsnummer för det rum du vill ändra status på: ");
+
+                // Försök att hämta rummet från databasen
+                var currentRoom = _roomService.ReadRoom(roomId);
+
+                if (currentRoom == null)
+                {
+                    // Om rummet inte hittas
+                    AnsiConsole.MarkupLine("[red]Inget rum med det rumsnumret kunde hittas![/]");
+                    if (!AnsiConsole.Confirm("Vill du försöka igen?"))
+                    {
+                        // Avbryt om användaren inte vill försöka igen
+                        return;
+                    }
+                }
+                else
+                {
+                    // Fråga användaren om vilken status de vill sätta på rummet
+                    var newStatus = AnsiConsole.Prompt(
+                        new SelectionPrompt<StatusOfRoom>()
+                            .Title("Välj den nya statusen på rummet: ")
+                            .AddChoices(StatusOfRoom.Active, StatusOfRoom.InActive, StatusOfRoom.UnderMaintenance));
+
+                    // Försök att ändra statusen på rummet via tjänsten
+                    var result = _roomService.ChangeStatusOnRoom(roomId, newStatus); // Ändra metoden till ChangeRoomStatus
+
+                    if (result)
+                    {
+                        AnsiConsole.MarkupLine($"Statusen för rum [green]{roomId}[/] har ändrats till [green]{newStatus}[/].");
+                        Console.ReadKey();
+                    }
+                    else
+                    {
+                        AnsiConsole.WriteLine("Statusändringen misslyckades.");
+                        Console.ReadKey();
+                    }
+                }
+
+                // Fråga om användaren vill ändra status på ett till rum
+                continueChangingStatus = AnsiConsole.Confirm("Vill du ändra status på ett till rum?");
             }
         }
+
 
         public Room GetRoomDetailsFromUser(Room currentRoom)
         {

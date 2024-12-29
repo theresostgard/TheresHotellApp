@@ -63,7 +63,7 @@ namespace HotellApp.Services.RoomServices
             }
 
         }
-        public bool DeleteRoom(int roomId, StatusOfRoom newStatus)
+        public bool ChangeStatusOnRoom(int roomId, StatusOfRoom newStatus)
         {
 
             if (HasUpcomingBookings(roomId))

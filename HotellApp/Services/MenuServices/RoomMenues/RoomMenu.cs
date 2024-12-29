@@ -49,7 +49,7 @@ namespace HotellApp.Services.MenuServices.RoomMenues
                     _roomController.UpdateRoomController();
                     break;
                 case "Ändra status på rum":
-                    _roomController.DeleteRoomController();
+                    _roomController.ChangeStatusOnRoomController();
                     break;
                 case "Tillbaka till huvudmenyn":
                     Console.WriteLine("Tillbaka till huvudmenyn...");

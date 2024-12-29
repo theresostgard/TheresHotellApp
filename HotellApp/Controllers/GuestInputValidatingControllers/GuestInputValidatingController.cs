@@ -81,14 +81,7 @@ namespace HotellApp.Controllers.GuestInputValidatingControllers
                     .HighlightStyle("cyan")
                     .AddChoices(GuestStatus.Active, GuestStatus.Inactive));
 
-            Console.Clear();
-            AnsiConsole.MarkupLine("\n[bold green]Sammanfattning av uppdaterad gästinformation:[/]");
-
-            _displayGuest.DisplayGuestInformation(currentGuestData);
-
-            Console.ReadKey();
-
-            return new Guest
+            var updatedGuest = new Guest
             {
                 GuestId = currentGuestData.GuestId,
                 FirstName = guestFirstName,
@@ -97,6 +90,14 @@ namespace HotellApp.Controllers.GuestInputValidatingControllers
                 EmailAdress = guestEmailAdress,
                 GuestStatus = statusOfGuest
             };
+
+            Console.Clear();
+            AnsiConsole.MarkupLine("\n[bold green]Sammanfattning av uppdaterad gästinformation:[/]");
+            _displayGuest.DisplayGuestInformation(updatedGuest); // Visa uppdaterad gästinformation
+
+            Console.ReadKey();
+
+            return updatedGuest; // Returnera den uppdaterade gästen
         }
 
         public string ValidateEmailAddressExistingGuest(string currentEmail)
