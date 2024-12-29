@@ -32,6 +32,7 @@ namespace HotellApp.Utilities.RoomDisplay
             table.AddRow("[yellow]Extrasängar tillåtet?[/]", room.IsExtraBedAllowed.ToString());
             table.AddRow("[yellow]Antal extrasängar (om tillåtet)[/]", room.AmountOfExtraBeds.ToString());
             table.AddRow("[yellow]Status[/]", room.Status.ToString());
+            table.AddRow("[yellow]Pris/natt[/]", room.PricePerNight.ToString());
 
 
             return table;

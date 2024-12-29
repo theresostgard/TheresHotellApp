@@ -21,7 +21,7 @@ namespace HotellApp.Models
 
         public virtual ICollection<Booking>? Bookings { get; set; } 
 
-        public virtual ICollection<Invoice>? Invoices { get; set; } 
+        
     }
 
 }

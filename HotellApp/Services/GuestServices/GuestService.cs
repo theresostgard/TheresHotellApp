@@ -30,14 +30,11 @@ namespace HotellApp.Services.GuestServices
         }
 
         public Guest ReadGuest(int guestId)
-        {
-            
+        { 
                 var guestbyId = _dbContext.Guest
                     .FirstOrDefault(g => g.GuestId == guestId);
 
                 return guestbyId;
-            
-          
         }
 
         public List<Guest> GetAllGuests()
@@ -47,34 +44,46 @@ namespace HotellApp.Services.GuestServices
 
         public void UpdateGuest(int guestId, Guest updatedGuest)
         {
-
             var guest = _dbContext.Guest
                 .Include(b => b.Bookings)
                 .FirstOrDefault(c => c.GuestId == guestId);
 
             if (guest == null)
             {
-
                 AnsiConsole.WriteLine("Ingen gäst med det GästId:t kunde hittas.");
-                
+                return;
             }
-            if (guest.Bookings == null || guest.Bookings.Count == 0)
+
+            // Definiera tidsperioden (2 år framåt och bakåt)
+            DateTime twoYearsAgo = DateTime.Now.AddYears(-2);
+            DateTime twoYearsAhead = DateTime.Now.AddYears(2);
+
+            // Kontrollera om gästen har några bokningar inom den angivna perioden
+            bool hasBookingsWithinPeriod = guest.Bookings
+                .Any(b => b.ArrivalDate >= twoYearsAgo && b.ArrivalDate <= twoYearsAhead);
+
+            if (hasBookingsWithinPeriod)
             {
+                AnsiConsole.MarkupLine("[red]Statusen kan inte ändras eftersom gästen har bokningar inom två år (föregående/kommande).[/]");
+                // Behåll alla andra uppdateringar men hindra ändring av status
+                guest.FirstName = updatedGuest.FirstName;
+                guest.LastName = updatedGuest.LastName;
+                guest.PhoneNumber = updatedGuest.PhoneNumber;
+                guest.EmailAdress = updatedGuest.EmailAdress;
+            }
+            else
+            {
+                // Om det inte finns några bokningar inom perioden, tillåt även ändring av status
                 guest.FirstName = updatedGuest.FirstName;
                 guest.LastName = updatedGuest.LastName;
                 guest.PhoneNumber = updatedGuest.PhoneNumber;
                 guest.EmailAdress = updatedGuest.EmailAdress;
                 guest.GuestStatus = updatedGuest.GuestStatus;
-
-                _dbContext.Entry(guest).State = EntityState.Modified;
-                _dbContext.SaveChanges();
-            }
-            else
-            {
-                AnsiConsole.WriteLine("Gästens status kan inte uppdateras för den har bokningar.");
             }
 
-            
+            _dbContext.Entry(guest).State = EntityState.Modified;
+            _dbContext.SaveChanges();
+
         }
         public string DeleteGuest(int guestId)
         {
@@ -99,24 +108,6 @@ namespace HotellApp.Services.GuestServices
                 return "Gästen har bokningar och kan inte tas bort.";
             }
         }
-
-        //public int GetLatestGuestId()
-        //{
-           
-        //        var latestGuest = _dbContext.Guest
-        //            .OrderByDescending(g => g.GuestId)
-        //            .FirstOrDefault();
-
-        //        if (latestGuest == null)
-        //        {
-        //            Console.WriteLine("Inga gäster finns i databasen.");
-        //            return 0;
-        //        }
-
-        //        return latestGuest.GuestId;
-            
-
-        //}
 
 
     }

@@ -12,7 +12,7 @@ namespace HotellApp.Controllers.RoomController
         void ReadRoomController();
 
         void UpdateRoomController();
-        void DeleteRoomController();
+        void ChangeStatusOnRoomController();
         Room GetRoomDetailsFromUser(Room currentRoom);
         bool ShouldAllowExtraBed(int roomSize, TypeOfRoom roomType);
 

@@ -51,6 +51,7 @@ namespace HotellApp.Services.RoomServices
                 room.RoomSize = updatedRoom.RoomSize;
                 room.IsExtraBedAllowed = updatedRoom.IsExtraBedAllowed;
                 room.AmountOfExtraBeds = updatedRoom.AmountOfExtraBeds;
+                room.PricePerNight = updatedRoom.PricePerNight;
                 
 
                 _dbContext.SaveChanges();
@@ -62,7 +63,7 @@ namespace HotellApp.Services.RoomServices
             }
 
         }
-        public bool DeleteRoom(int roomId, StatusOfRoom newStatus)
+        public bool ChangeStatusOnRoom(int roomId, StatusOfRoom newStatus)
         {
 
             if (HasUpcomingBookings(roomId))

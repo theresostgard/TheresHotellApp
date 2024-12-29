@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using HotellApp.Services.BookingServices;
 using HotellApp.Services.RoomServices;
+using Microsoft.EntityFrameworkCore;
 
 namespace HotellApp.Controllers.BookingCreationController
 {
@@ -31,7 +32,11 @@ namespace HotellApp.Controllers.BookingCreationController
                 {
                     Console.WriteLine("Ankomstdatumet måste vara ett framtida datum. Försök igen.");
                 }
-            } while (arrivalDate < DateTime.Now.Date);
+                else
+                {
+                    arrivalDate = arrivalDate.Date.AddHours(15);
+                }
+            } while (arrivalDate < DateTime.Now.Date.AddHours(15));
             return arrivalDate;
         }
 
@@ -41,11 +46,15 @@ namespace HotellApp.Controllers.BookingCreationController
             do
             {
                 departureDate = AnsiConsole.Ask<DateTime>("Avresedatum (yyyy-MM-dd):");
-                if (departureDate <= arrivalDate)
+                if (departureDate <= arrivalDate.Date)
                 {
                     Console.WriteLine("Avresedatumet måste vara efter ankomstdatumet. Försök igen.");
                 }
-            } while (departureDate <= arrivalDate);
+                else
+                {
+                    departureDate = departureDate.Date.AddHours(11);
+                }
+            } while (departureDate <= arrivalDate.Date.AddHours(15));
             return departureDate;
         }
 
@@ -149,6 +158,8 @@ namespace HotellApp.Controllers.BookingCreationController
 
             return selectedRooms;  // Retur av de valda rummen om antalet matchar
         }
+
+       
         public Booking CreateBooking(int guestId,
             DateTime arrivalDate,
             DateTime departureDate,
