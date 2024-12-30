@@ -1,16 +1,9 @@
 ﻿using Autofac;
 using HotellApp.Controllers.MenuServices.MainMenues;
 using HotellApp.Data;
-using HotellApp.Services;
 using HotellApp.Utilities.Screens;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HotellApp
 {
