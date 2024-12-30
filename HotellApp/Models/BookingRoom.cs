@@ -12,7 +12,7 @@ namespace HotellApp.Models
         public int BookingId { get; set; }
         public int RoomId { get; set; }
 
-        public Booking Booking { get; set; }    // En bokning är kopplad till ett rum
-        public Room Room { get; set; }          // Ett rum är kopplat till en bokning
+        public Booking Booking { get; set; }   
+        public Room Room { get; set; }          
     }
 }

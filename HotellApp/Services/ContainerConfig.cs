@@ -6,11 +6,6 @@ using HotellApp.Controllers.RoomController;
 using HotellApp.Data;
 using HotellApp.Services.BookingServices;
 using HotellApp.Services.GuestServices;
-using HotellApp.Services.InvoiceServices;
-using HotellApp.Services.MenuServices.BookingMenues;
-using HotellApp.Services.MenuServices.GuestMenu;
-using HotellApp.Services.MenuServices.MainMenues;
-using HotellApp.Services.MenuServices.RoomMenues;
 using HotellApp.Services.RoomServices;
 using HotellApp.Services.ServiceFactorys;
 using HotellApp.Services.GuestServices;
@@ -26,6 +21,14 @@ using HotellApp.Utilities.RoomDisplay;
 using HotellApp.Controllers.BookingCreationController;
 using HotellApp.Utilities.GuestDisplay;
 using HotellApp.Controllers.GuestInputValidatingControllers;
+using HotellApp.Controllers.MenuServices.BookingMenues;
+using HotellApp.Controllers.MenuServices.GuestMenues;
+using HotellApp.Controllers.MenuServices.MainMenues;
+using HotellApp.Controllers.MenuServices.RoomMenues;
+using HotellApp.Controllers.MenuControllers.BookingMenues;
+using HotellApp.Controllers.MenuControllers.GuestMenues;
+using HotellApp.Controllers.MenuControllers.MainMenues;
+using HotellApp.Controllers.MenuControllers.RoomMenues;
 
 
 namespace HotellApp.Services
@@ -41,7 +44,6 @@ namespace HotellApp.Services
             builder.RegisterType<GuestService>().As<IGuestService>().InstancePerLifetimeScope();
             builder.RegisterType<BookingService>().As<IBookingService>().InstancePerLifetimeScope();
             builder.RegisterType<RoomService>().As<IRoomService>().InstancePerLifetimeScope();
-            builder.RegisterType<InvoiceService>().As<IInvoiceService>().InstancePerLifetimeScope();
 
             // Registrera menyer och controllers
             builder.RegisterType<BookingMenu>().As<IBookingMenu>().InstancePerLifetimeScope();

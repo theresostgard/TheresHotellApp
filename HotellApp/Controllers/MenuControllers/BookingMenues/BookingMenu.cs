@@ -1,12 +1,8 @@
 ﻿using HotellApp.Controllers.BookingController;
-using HotellApp.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using HotellApp.Controllers.MenuServices.BookingMenues;
+using HotellApp.Utilities;
 
-namespace HotellApp.Services.MenuServices.BookingMenues
+namespace HotellApp.Controllers.MenuControllers.BookingMenues
 {
     public class BookingMenu : IBookingMenu
     {
@@ -31,7 +27,7 @@ namespace HotellApp.Services.MenuServices.BookingMenues
         public void ShowBookingOptions()
         {
             int selectedIndex = 0;
-      
+
             MenuRenderer.ShowMenu(_menuItems, ref selectedIndex, "Bokningsmeny", HandleMenuSelection);
         }
 
@@ -62,7 +58,7 @@ namespace HotellApp.Services.MenuServices.BookingMenues
                     _bookingController.DeleteBookingController();
                     break;
                 case "Tillbaka till huvudmenyn":
-     
+
                     return;
                 default:
                     Console.WriteLine("Ogiltigt val.");

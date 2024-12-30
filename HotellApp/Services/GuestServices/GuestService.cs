@@ -54,18 +54,15 @@ namespace HotellApp.Services.GuestServices
                 return;
             }
 
-            // Definiera tidsperioden (2 år framåt och bakåt)
             DateTime twoYearsAgo = DateTime.Now.AddYears(-2);
             DateTime twoYearsAhead = DateTime.Now.AddYears(2);
 
-            // Kontrollera om gästen har några bokningar inom den angivna perioden
             bool hasBookingsWithinPeriod = guest.Bookings
                 .Any(b => b.ArrivalDate >= twoYearsAgo && b.ArrivalDate <= twoYearsAhead);
 
             if (hasBookingsWithinPeriod)
             {
                 AnsiConsole.MarkupLine("[red]Statusen kan inte ändras eftersom gästen har bokningar inom två år (föregående/kommande).[/]");
-                // Behåll alla andra uppdateringar men hindra ändring av status
                 guest.FirstName = updatedGuest.FirstName;
                 guest.LastName = updatedGuest.LastName;
                 guest.PhoneNumber = updatedGuest.PhoneNumber;
@@ -73,7 +70,6 @@ namespace HotellApp.Services.GuestServices
             }
             else
             {
-                // Om det inte finns några bokningar inom perioden, tillåt även ändring av status
                 guest.FirstName = updatedGuest.FirstName;
                 guest.LastName = updatedGuest.LastName;
                 guest.PhoneNumber = updatedGuest.PhoneNumber;
@@ -99,8 +95,8 @@ namespace HotellApp.Services.GuestServices
 
             if (guest.Bookings == null || guest.Bookings.Count == 0)
             {
-                _dbContext.Guest.Remove(guest);  // Ta bort gästen från kontexten
-                _dbContext.SaveChanges();        // Spara ändringarna till databasen
+                _dbContext.Guest.Remove(guest);  
+                _dbContext.SaveChanges();       
                 return "Gästen har raderats.";
             }
             else

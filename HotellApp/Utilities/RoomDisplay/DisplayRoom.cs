@@ -40,7 +40,7 @@ namespace HotellApp.Utilities.RoomDisplay
 
         public void Pagination(List<Room> rooms)
         {
-            int pageSize = 2; // Antal bokningar per sida
+            int pageSize = 2; 
             int totalPages = (int)Math.Ceiling(rooms.Count / (double)pageSize);
             int currentPage = 1;
 
@@ -49,7 +49,6 @@ namespace HotellApp.Utilities.RoomDisplay
                 Console.Clear();
                 AnsiConsole.MarkupLine($"[bold yellow]Sida {currentPage}/{totalPages}[/]");
 
-                // Hämta bokningar för aktuell sida
                 var roomsToDisplay = rooms
                     .Skip(currentPage * pageSize)
                     .Take(pageSize)
@@ -58,14 +57,7 @@ namespace HotellApp.Utilities.RoomDisplay
                 {
                     DisplayRoomInformation(room);
                 }
-                // Rendera bokningar på aktuell sida
-                //foreach (var room in roomsToDisplay)
-                //{
-                //    var guestName = booking.Guest != null ? $"{booking.Guest.FirstName} {booking.Guest.LastName}" : "Ingen gäst kopplad";
-                //   // _displayBooking.DisplayBookingInformation(booking);
-                //}
-
-                // Visa sidinformation och navigering
+ 
                 AnsiConsole.MarkupLine("[green]Använd pil-tangenter för att navigera. Tryck på [/][red]Esc[/] [green]för att avsluta.[/]");
                 var key = Console.ReadKey(true).Key;
 
@@ -77,7 +69,7 @@ namespace HotellApp.Utilities.RoomDisplay
                     }
                     else
                     {
-                        currentPage = 1; // Börja om på första sidan
+                        currentPage = 1; 
                     }
                 }
                 else if (key == ConsoleKey.LeftArrow && currentPage > 1)
@@ -86,7 +78,7 @@ namespace HotellApp.Utilities.RoomDisplay
                 }
                 else if (key == ConsoleKey.Escape)
                 {
-                    break; // Avsluta programmet
+                    break; 
                 }
             }
         }

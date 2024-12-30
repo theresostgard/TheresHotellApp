@@ -93,47 +93,47 @@ namespace HotellApp.Controllers.GuestInputValidatingControllers
 
             Console.Clear();
             AnsiConsole.MarkupLine("\n[bold green]Sammanfattning av uppdaterad gästinformation:[/]");
-            _displayGuest.DisplayGuestInformation(updatedGuest); // Visa uppdaterad gästinformation
+            _displayGuest.DisplayGuestInformation(updatedGuest); 
 
             Console.ReadKey();
 
-            return updatedGuest; // Returnera den uppdaterade gästen
+            return updatedGuest; 
         }
 
         public string ValidateEmailAddressExistingGuest(string currentEmail)
         {
             return AnsiConsole.Prompt(
                 new TextPrompt<string>("E-post:")
-                    .AllowEmpty() // Tillåt tom inmatning
-                    .DefaultValue(currentEmail) // Använd det befintliga värdet om tomt
+                    .AllowEmpty() 
+                    .DefaultValue(currentEmail) 
                     .ValidationErrorMessage("[red]Ogiltig e-postadress!\nEn e-mailadress måste innehålla ett @ och en punkt![/]")
                     .Validate(input =>
-                        string.IsNullOrEmpty(input) || // Om input är tom, lämna det som det är
-                        System.Text.RegularExpressions.Regex.IsMatch(input, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))); // Validera om något anges
+                        string.IsNullOrEmpty(input) || 
+                        System.Text.RegularExpressions.Regex.IsMatch(input, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))); 
         }
 
         public string ValidatePhoneNumberExistingGuest(string currentPhoneNumber)
         {
             return AnsiConsole.Prompt(
                 new TextPrompt<string>("Telefonnummer:")
-                    .AllowEmpty() // Tillåt tom inmatning
-                    .DefaultValue(currentPhoneNumber) // Använd det befintliga värdet om tomt
+                    .AllowEmpty() 
+                    .DefaultValue(currentPhoneNumber) 
                     .ValidationErrorMessage("[red]Telefonnumret måste vara numeriskt och innehålla minst 10 siffror![/]")
                     .Validate(input =>
-                        string.IsNullOrEmpty(input) || // Om input är tom, lämna det som det är
-                        (long.TryParse(input, out _) && input.Length >= 10))); // Validera om något anges
+                        string.IsNullOrEmpty(input) || 
+                        (long.TryParse(input, out _) && input.Length >= 10))); 
         }
 
         public string ValidateNameExistingGuest(string prompt, string errorMessage, string currentName)
         {
             return AnsiConsole.Prompt(
                 new TextPrompt<string>(prompt)
-                    .AllowEmpty() // Tillåt tom inmatning
-                    .DefaultValue(currentName) // Använd det befintliga värdet om tomt
+                    .AllowEmpty() 
+                    .DefaultValue(currentName) 
                     .ValidationErrorMessage(errorMessage)
                     .Validate(input =>
-                        string.IsNullOrEmpty(input) || // Om input är tom, lämna det som det är
-                        input.Trim().Length >= 2)); // Validera om något anges
+                        string.IsNullOrEmpty(input) || 
+                        input.Trim().Length >= 2)); 
         }
     }
 }

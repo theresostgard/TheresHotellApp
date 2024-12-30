@@ -20,19 +20,16 @@ namespace HotellApp.Models
 
         public sbyte AmountOfRooms { get; set; }
 
-        public int GuestId { get; set; }     //behöver hämtas från customerentiteten eller genereras ny (via detsamma)
+        public int GuestId { get; set; }    
 
-        public Guest Guest { get; set; } // En bokning kan ha en gäst
-
-        // Relaterad information för extrasängar
+        public Guest Guest { get; set; } 
        
-        public int AmountOfExtraBeds { get; set; } // Hur många extrasängar som önskas
+        public int AmountOfExtraBeds { get; set; } 
 
         public ICollection<BookingRoom> BookingRooms { get; set; }
 
         public BookingStatus Status { get; set; }
 
-       
 
     }
 }

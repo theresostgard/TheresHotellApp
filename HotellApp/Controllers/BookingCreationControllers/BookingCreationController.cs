@@ -70,7 +70,6 @@ namespace HotellApp.Controllers.BookingCreationController
 
             var amountOfExtraBeds = 0;
 
-            // Fråga om extrasängar om rummet är av typen Double
             if (roomType == TypeOfRoom.Double)
             {
                 var isExtraBedWanted = AnsiConsole.Prompt(
@@ -126,14 +125,12 @@ namespace HotellApp.Controllers.BookingCreationController
             var table = new Table();
             table.AddColumn("Rum #");
             table.AddColumn("Typ");
-            //table.AddColumn("Status");
             table.AddColumn("Storlek");
 
             foreach (var room in availableRooms.Where(r => r.Status == StatusOfRoom.Active))
             {
                 table.AddRow(room.RoomId.ToString(),
                     room.RoomType.ToString(),
-                    //room.Status.ToString(),
                     room.RoomSize.ToString());
             }
 
@@ -149,14 +146,13 @@ namespace HotellApp.Controllers.BookingCreationController
              .UseConverter(room => $"# {room.RoomId} ({room.RoomType})"))
              .ToList();
 
-            // Kontrollera att användaren har valt exakt det antal rum
             if (selectedRooms.Count != amountOfRooms)
             {
                 Console.Clear();
-                return new List<Room>();  // Retur av en tom lista för att indikera ett ogiltigt val
+                return new List<Room>();  
             }
 
-            return selectedRooms;  // Retur av de valda rummen om antalet matchar
+            return selectedRooms;  
         }
 
        

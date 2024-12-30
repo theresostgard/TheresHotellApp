@@ -1,7 +1,8 @@
 ﻿using Autofac;
+using HotellApp.Controllers.MenuServices.MainMenues;
 using HotellApp.Data;
 using HotellApp.Services;
-using HotellApp.Services.MenuServices.MainMenues;
+using HotellApp.Utilities.Screens;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -25,7 +26,9 @@ namespace HotellApp
         public void Run()
         {
             Console.Title = "TheresHotell";
-           
+
+            StartScreen.Print();
+
             var builder = new ConfigurationBuilder()
                 .AddJsonFile($"appsettings.json", true, true);
             var config = builder.Build();
@@ -36,16 +39,16 @@ namespace HotellApp
 
             using (var dbContext = new ApplicationDbContext(options.Options))
             {
-                var dataInitiaizer = new DataInitializer();
-                dataInitiaizer.MigrateAndSeed(dbContext); 
+                var dataInitializer = new DataInitializer();
+                dataInitializer.MigrateAndSeed(dbContext); 
             }
 
             
-            using (var scope = _container.BeginLifetimeScope())  // Börja ett nytt scope för DI
+            using (var scope = _container.BeginLifetimeScope())  
             {
-                // Lösa MainMenu från container via DI
-                var mainMenu = scope.Resolve<IMainMenu>();  // Löser MainMenu via DI
-                mainMenu.ShowMainMenu();  // Visar huvudmenyn
+
+                var mainMenu = scope.Resolve<IMainMenu>();  
+                mainMenu.ShowMainMenu();  
             }
 
         }

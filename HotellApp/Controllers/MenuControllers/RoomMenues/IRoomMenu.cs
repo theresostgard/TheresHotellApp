@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HotellApp.Services.MenuServices.MainMenues
+namespace HotellApp.Controllers.MenuServices.RoomMenues
 {
-    public interface IMainMenu
+    public interface IRoomMenu
     {
-        void ShowMainMenu();
+        void ShowRoomOptions();
     }
 }

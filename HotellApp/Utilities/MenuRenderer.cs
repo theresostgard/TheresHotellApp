@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HotellApp.Graphics
+namespace HotellApp.Utilities
 {
     public static class MenuRenderer
     {
@@ -16,33 +16,31 @@ namespace HotellApp.Graphics
             while (inMenu)
             {
                 Console.Clear();
-                //Skapa en regel för menytiteln
-                Spectre.Console.AnsiConsole.Write(
-                    new Spectre.Console.Rule($"[bold blue]{headerTitle}[/]")
-                        .Justify(Spectre.Console.Justify.Center)
+                AnsiConsole.Write(
+                    new Rule($"[bold blue]{headerTitle}[/]")
+                        .Justify(Justify.Center)
                 );
 
 
 
-                // Instruktioner för att navigera
-                Spectre.Console.AnsiConsole.Write(new Spectre.Console.Markup(
+                AnsiConsole.Write(new Markup(
                     "[italic grey]Använd [yellow]piltangenterna[/] för att navigera och [green]Enter[/] för att välja:[/]\n"
                 ));
 
-                // Skapa en panel runt menyn
-                var menuPanel = new Spectre.Console.Panel(RenderMenu(menuItems, selectedIndex))
+   
+                var menuPanel = new Panel(RenderMenu(menuItems, selectedIndex))
                 {
-                    Border = Spectre.Console.BoxBorder.Double,
-                    BorderStyle = Spectre.Console.Style.Parse("green"),
-                    Header = new Spectre.Console.PanelHeader("[bold blue]Menyval[/]")
+                    Border = BoxBorder.Double,
+                    BorderStyle = Style.Parse("green"),
+                    Header = new PanelHeader("[bold blue]Menyval[/]")
 
                 };
 
 
 
-                Spectre.Console.AnsiConsole.Write(menuPanel);
+                AnsiConsole.Write(menuPanel);
 
-                // Vänta på användarens val
+
                 var key = Console.ReadKey(intercept: true).Key;
                 switch (key)
                 {
@@ -53,10 +51,9 @@ namespace HotellApp.Graphics
                         selectedIndex = selectedIndex == menuItems.Length - 1 ? 0 : selectedIndex + 1;
                         break;
                     case ConsoleKey.Enter:
-                        // Utför det valda alternativet
+  
                         onSelect(selectedIndex);
 
-                        // Om det valda alternativet är "Tillbaka till huvudmenyn", sätt inMenu till false
                         if (menuItems[selectedIndex] == "Tillbaka till huvudmenyn")
                         {
                             inMenu = false;
@@ -66,23 +63,19 @@ namespace HotellApp.Graphics
             }
         }
 
-
-        // Metod för att formatera och skapa strängen för menyn
         private static string RenderMenu(string[] menuItems, int selectedIndex)
         {
-            var menuBuilder = new System.Text.StringBuilder();
+            var menuBuilder = new StringBuilder();
 
             for (int i = 0; i < menuItems.Length; i++)
             {
-                string marker = i == selectedIndex ? " => " : "    "; // Marker for the selected item
+                string marker = i == selectedIndex ? " => " : "    "; 
 
-                // Conditional styling: Blue for selected, Red for "Tillbaka till huvudmenyn"
                 string style = i == selectedIndex
-                    ? (menuItems[i] == "Tillbaka till huvudmenyn" ? "[bold red]" : "[bold green]")
-                    : "[white]"; // Default white for non-selected items
+                    ? menuItems[i] == "Tillbaka till huvudmenyn" ? "[bold red]" : "[bold green]"
+                    : "[white]"; 
 
-                // Add the menu item with the proper style
-                menuBuilder.AppendLine($"{marker}{style}{menuItems[i]}[/]");  // Using Spectre markup to apply styles
+                menuBuilder.AppendLine($"{marker}{style}{menuItems[i]}[/]");  
             }
 
             return menuBuilder.ToString();

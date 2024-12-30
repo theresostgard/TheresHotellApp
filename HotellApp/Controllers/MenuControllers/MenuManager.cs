@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HotellApp.Services.MenuServices
+namespace HotellApp.Controllers.MenuControllers
 {
     public class MenuManager : IMenuService
     {
@@ -30,7 +30,6 @@ namespace HotellApp.Services.MenuServices
                 Console.Clear();
                 Console.WriteLine("Använd upp- och ner-pilarna för att navigera och Enter för att välja:");
 
-                // Visa menyn
                 for (int i = 0; i < _menuItems.Length; i++)
                 {
                     string spacing = i == selectedIndex ? " => " : "    ";
@@ -46,7 +45,6 @@ namespace HotellApp.Services.MenuServices
                     }
                 }
 
-                // Hantera knapptryckningar
                 var key = Console.ReadKey(true).Key;
                 switch (key)
                 {
@@ -59,10 +57,9 @@ namespace HotellApp.Services.MenuServices
                         break;
 
                     case ConsoleKey.Enter:
-                        _handleMenuSelection(selectedIndex);  // Anropar den valda metoden
+                        _handleMenuSelection(selectedIndex);
 
-                        // Om användaren valde "Tillbaka till huvudmenyn", återgå till huvudmenyn
-                        if (selectedIndex == _menuItems.Length - 1)  // Tillbaka till huvudmenyn
+                        if (selectedIndex == _menuItems.Length - 1)
                         {
                             isRunning = false;
                         }

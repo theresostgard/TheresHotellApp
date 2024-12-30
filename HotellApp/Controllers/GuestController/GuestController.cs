@@ -103,17 +103,6 @@ namespace HotellApp.Controllers.GuestController
 
         public void ReadAllGuestsController()
         {
-            //var guests = _guestService.GetAllGuests();
-
-            //if (guests != null && guests.Any())
-            //{
-            //        _displayLists.DisplayGuests();
-            //}
-            //else
-            //{
-            //    Console.WriteLine("Inga gäster finns registrerade.");
-            //}
-
             _displayLists.DisplayGuests();
         }
 
@@ -142,7 +131,6 @@ namespace HotellApp.Controllers.GuestController
                     .Title("Vill du se en till gästs information?")
                     .AddChoices("Ja", "Nej"));
 
-                    // Continue or exit the loop
                     isReadingGuest = continueReading.Trim() == "Ja";
                 }
                 else
@@ -242,34 +230,31 @@ namespace HotellApp.Controllers.GuestController
                     AnsiConsole.Markup("[red]Ogiltigt val. Försök igen.[/]");
                 }
             }
-
-            // Handle NewGuest selection    
+ 
             if (guestType == GuestType.NewGuest)
             {
                 Console.WriteLine("Skapa ny kund:");
                 CreateGuestController();
-                // guestId = GetLatestGuestId(); // Om du har en metod för att hämta det senaste ID:t
             }
-            // Handle ExistingGuest selection
+
             else if (guestType == GuestType.ExistingGuest)
             {
                 _displayLists.DisplayGuests();
 
-                while (true) // Loop för att låta användaren försöka igen
+                while (true) 
                 {
                     Console.WriteLine("Ange gästens kundnummer: ");
                     guestId = int.TryParse(Console.ReadLine(), out var id) ? id : (int?)null;
 
                     if (guestId.HasValue)
                     {
-                        var existingGuest = _guestService.ReadGuest(guestId.Value); // Kolla om gästen finns i databasen
+                        var existingGuest = _guestService.ReadGuest(guestId.Value); 
 
                         if (existingGuest == null)
                         {
                             Console.WriteLine("Det angivna kundnumret kunde inte hittas.");
                             if (!AnsiConsole.Confirm("Vill du försöka igen?"))
                             {
-                                // Avbryt om användaren inte vill försöka igen
                                 return (guestType, null);
                             }
                         }
@@ -277,7 +262,7 @@ namespace HotellApp.Controllers.GuestController
                         {
                             Console.Clear();
                             Console.WriteLine($"Gäst funnen: {existingGuest.FirstName} {existingGuest.LastName}");
-                            break; // Avsluta loopen om en gäst hittades
+                            break; 
                         }
                     }
                     else
@@ -286,12 +271,7 @@ namespace HotellApp.Controllers.GuestController
                     }
                 }
             }
-
-            // Return the selected guest type and the associated guest ID
             return (guestType, guestId);
         }
-
-
-
     }
 }

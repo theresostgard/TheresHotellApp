@@ -1,17 +1,18 @@
 ﻿using HotellApp.Controllers.GuestController;
-using HotellApp.Graphics;
+using HotellApp.Controllers.MenuServices.GuestMenues;
+using HotellApp.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HotellApp.Services.MenuServices.GuestMenu
+namespace HotellApp.Controllers.MenuControllers.GuestMenues
 {
     public class GuestMenu : IGuestMenu
     {
         private readonly IGuestController _guestController;
-      
+
 
         public GuestMenu(IGuestController guestController)
         {
@@ -38,7 +39,7 @@ namespace HotellApp.Services.MenuServices.GuestMenu
 
         private void HandleMenuSelection(int selectedIndex)
         {
-          
+
             string selectedItem = _menuItems[selectedIndex];
             switch (selectedItem)
             {
@@ -57,11 +58,11 @@ namespace HotellApp.Services.MenuServices.GuestMenu
                     break;
                 case "Uppdatera gäst":
                     Console.Clear();
-                    _guestController.UpdateGuestController(); 
+                    _guestController.UpdateGuestController();
                     break;
                 case "Ta bort gäst":
                     Console.Clear();
-                    _guestController.DeleteGuestController();    
+                    _guestController.DeleteGuestController();
                     break;
                 case "Tillbaka till huvudmenyn":
                     Console.WriteLine("Tillbaka till huvudmenyn...");
@@ -70,7 +71,7 @@ namespace HotellApp.Services.MenuServices.GuestMenu
                     Console.WriteLine("Ogiltigt val.");
                     break;
             }
- 
+
 
         }
 

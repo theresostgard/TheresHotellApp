@@ -24,12 +24,11 @@ namespace HotellApp.Utilities.DisplayGuest
                                         $"[yellow]Mailadress:[/] {guest.EmailAdress}\n" +
                                         $"[yellow]Status:[/] {guest.GuestStatus}");
 
-                // Visa ramat information i en Box
                 AnsiConsole.Write(
                     new Panel(guestInfo)
-                        .BorderColor(Color.Green) // Färg på ramen
-                        .Header($" Gästinformation ") // Lägg till header
-                        .Border(BoxBorder.Double) // dubbel ram
+                        .BorderColor(Color.Green) 
+                        .Header($" Gästinformation ") 
+                        .Border(BoxBorder.Double) 
                 );
             }
             else
