@@ -11,7 +11,7 @@ namespace HotellApp.Services.ServiceFactorys
 {
     public class ServiceFactory : IServiceFactory
     {
-       
+
 
         private readonly IComponentContext _context;
 
@@ -25,6 +25,6 @@ namespace HotellApp.Services.ServiceFactorys
             return _context.Resolve<T>();
         }
 
-      
+
     }
 }
