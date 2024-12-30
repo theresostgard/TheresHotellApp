@@ -1,7 +1,6 @@
 ﻿using HotellApp.Graphics;
 using HotellApp.Services.MenuServices.BookingMenues;
 using HotellApp.Services.MenuServices.GuestMenu;
-using HotellApp.Services.MenuServices.InvoiceMenues;
 using HotellApp.Services.MenuServices.RoomMenues;
 using HotellApp.Services.ServiceFactory;
 using System;
@@ -28,7 +27,6 @@ namespace HotellApp.Services.MenuServices.MainMenues
             "Bokning",
              "Gäst",
              "Rum",
-             "Faktura",
              "Avsluta"
         };
         public void ShowMainMenu()
@@ -60,11 +58,6 @@ namespace HotellApp.Services.MenuServices.MainMenues
                     roomMenu.ShowRoomOptions();
                     break;
 
-                case "Faktura":
-                    Console.Clear();
-                    var invoiceMenu = _serviceFactory.Get<IInvoiceMenu>();
-                    invoiceMenu.ShowInvoiceOptions();
-                    break;
                 case "Avsluta":
                     Console.Clear();
                     Console.WriteLine("Avslutar programmet...");
