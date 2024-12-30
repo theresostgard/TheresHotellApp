@@ -63,7 +63,7 @@ namespace HotellApp.Services.MenuServices.MainMenues
                     Console.WriteLine("Avslutar programmet...");
                     Console.ReadKey();
                     Console.Clear();
-                    Environment.Exit(0);        //för att få en avslutsscreen eller liknande så behövs väl en metod ovanför denna rad?
+                    Environment.Exit(0);        
 
 
                     break;
