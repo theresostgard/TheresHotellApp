@@ -13,8 +13,7 @@ namespace HotellApp.Models
         public int RoomId { get; set; }
         public StatusOfRoom Status { get; set; }
         public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; } // Kan vara null om statusen är aktuell
-                                              // Navigation property
-        public Room Room { get; set; } // Relaterad rum (valfritt beroende på om du använder Entity Framework för navigering)
+        public DateTime EndDate { get; set; } 
+        public Room Room { get; set; } 
     }
 }

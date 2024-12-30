@@ -1,15 +1,12 @@
-﻿using HotellApp.Graphics;
-using HotellApp.Services.MenuServices.BookingMenues;
-using HotellApp.Services.MenuServices.GuestMenu;
-using HotellApp.Services.MenuServices.RoomMenues;
+﻿using HotellApp.Controllers.MenuServices.BookingMenues;
+using HotellApp.Controllers.MenuServices.GuestMenues;
+using HotellApp.Controllers.MenuServices.MainMenues;
+using HotellApp.Controllers.MenuServices.RoomMenues;
 using HotellApp.Services.ServiceFactory;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using HotellApp.Utilities;
+using HotellApp.Utilities.Screens;
 
-namespace HotellApp.Services.MenuServices.MainMenues
+namespace HotellApp.Controllers.MenuControllers.MainMenues
 {
     public class MainMenu : IMainMenu
     {
@@ -63,12 +60,12 @@ namespace HotellApp.Services.MenuServices.MainMenues
                     Console.WriteLine("Avslutar programmet...");
                     Console.ReadKey();
                     Console.Clear();
-                    Environment.Exit(0);        
-
+                    EndScreen.Print();
+                    Environment.Exit(0);
 
                     break;
             }
-           
+
         }
     }
 }

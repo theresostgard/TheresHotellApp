@@ -30,13 +30,11 @@ namespace HotellApp.Controllers.RoomController
         {
             Console.Clear();
             AnsiConsole.WriteLine("Skapa nytt rum:\n\n");
-            // Välj rumstyp
             var roomType = AnsiConsole.Prompt(
                 new SelectionPrompt<TypeOfRoom>()
                     .Title("Välj rumsyp:")
                     .AddChoices(TypeOfRoom.Single, TypeOfRoom.Double));
 
-            // Fråga om rummets storlek
             var newRoomSize = AnsiConsole.Prompt(
                 new TextPrompt<int>("Ange rummets storlek i kvm:")
                     .Validate(size =>
@@ -49,7 +47,6 @@ namespace HotellApp.Controllers.RoomController
 
             var isExtraBedAllowed = ShouldAllowExtraBed(newRoomSize, roomType);
 
-            // Fråga om antal extrasängar om det är tillåtet
             var amountOfExtraBeds = AmountOfExtraBedsAllowedInRoom.None;
 
             if (isExtraBedAllowed)
@@ -59,9 +56,9 @@ namespace HotellApp.Controllers.RoomController
                         new SelectionPrompt<AmountOfExtraBedsAllowedInRoom>()
                             .Title("Hur många extrasängar ska tillåtas?")
                             .AddChoices(AmountOfExtraBedsAllowedInRoom.One, AmountOfExtraBedsAllowedInRoom.Two))
-                    : AmountOfExtraBedsAllowedInRoom.One; // För rum 15–35 kvm, max 1 extrasäng
+                    : AmountOfExtraBedsAllowedInRoom.One; 
             }
-            // Skapa rummet och lägg till det via tjänsten
+
             var room = new Room
             {
                 RoomType = roomType,
@@ -126,7 +123,7 @@ namespace HotellApp.Controllers.RoomController
 
                 if (continueOption == "Nej")
                 {
-                    IsContinuingReading = false;  // Stäng av loopen om användaren inte vill fortsätta
+                    IsContinuingReading = false;  
                 }
             }
         }
@@ -149,38 +146,29 @@ namespace HotellApp.Controllers.RoomController
 
             bool continueUpdatingRooms = true;
 
-            while (continueUpdatingRooms) // Loop för att låta användaren uppdatera flera rum
+            while (continueUpdatingRooms) 
             {
                 Console.Clear();
                 _displayLists.DisplayRooms();
                 
                 var roomId = AnsiConsole.Ask<int>("Ange rumsnummer för rummet du vill uppdatera:");
 
-                // Hämta rummet från databasen
                 var currentRoom = _roomService.ReadRoom(roomId);
 
                 if (currentRoom == null)
                 {
-                    // Om rummet inte hittas
                     AnsiConsole.MarkupLine("[red]Inget rum med det rumsnumret kunde hittas![/]");
                     if (!AnsiConsole.Confirm("Vill du försöka igen?"))
                     {
-                        // Avbryt om användaren inte vill försöka igen
                         return;
                     }
                 }
                 else
                 {
-                    // Hämta nya detaljer om rummet
                     var updatedRoom = GetRoomDetailsFromUser(currentRoom);
-
-                    // Uppdatera rummet via tjänsten
                     _roomService.UpdateRoom(roomId, updatedRoom);
-
                     AnsiConsole.MarkupLine($"[green]Rummet med ID {roomId} har uppdaterats.[/]");
                 }
-
-                // Fråga om användaren vill uppdatera ett till rum
                 continueUpdatingRooms = AnsiConsole.Confirm("Vill du uppdatera ett till rum?");
             }
         }
@@ -190,37 +178,31 @@ namespace HotellApp.Controllers.RoomController
 
             bool continueChangingStatus = true;
 
-            while (continueChangingStatus) // Loop för att låta användaren ändra status på flera rum
+            while (continueChangingStatus) 
             {
                 Console.Clear();
                 _displayLists.DisplayRooms();
-
-                // Hämta rumsnummer för det rum som ska ändras
                 var roomId = AnsiConsole.Ask<int>("Ange rumsnummer för det rum du vill ändra status på: ");
 
-                // Försök att hämta rummet från databasen
                 var currentRoom = _roomService.ReadRoom(roomId);
 
                 if (currentRoom == null)
                 {
-                    // Om rummet inte hittas
+
                     AnsiConsole.MarkupLine("[red]Inget rum med det rumsnumret kunde hittas![/]");
                     if (!AnsiConsole.Confirm("Vill du försöka igen?"))
                     {
-                        // Avbryt om användaren inte vill försöka igen
                         return;
                     }
                 }
                 else
                 {
-                    // Fråga användaren om vilken status de vill sätta på rummet
                     var newStatus = AnsiConsole.Prompt(
                         new SelectionPrompt<StatusOfRoom>()
                             .Title("Välj den nya statusen på rummet: ")
                             .AddChoices(StatusOfRoom.Active, StatusOfRoom.InActive, StatusOfRoom.UnderMaintenance));
 
-                    // Försök att ändra statusen på rummet via tjänsten
-                    var result = _roomService.ChangeStatusOnRoom(roomId, newStatus); // Ändra metoden till ChangeRoomStatus
+                    var result = _roomService.ChangeStatusOnRoom(roomId, newStatus); 
 
                     if (result)
                     {
@@ -234,7 +216,6 @@ namespace HotellApp.Controllers.RoomController
                     }
                 }
 
-                // Fråga om användaren vill ändra status på ett till rum
                 continueChangingStatus = AnsiConsole.Confirm("Vill du ändra status på ett till rum?");
             }
         }
@@ -253,7 +234,7 @@ namespace HotellApp.Controllers.RoomController
             var roomSize = AnsiConsole.Ask<int>($"Nuvarande storlek: {currentRoom.RoomSize} kvm.\nAnge ny storlek:");
 
 
-            bool canHaveExtraBed = roomSize >= 15 && currentRoom?.RoomType == TypeOfRoom.Double; // Endast dubbelrum kan ha extrasäng
+            bool canHaveExtraBed = roomSize >= 15 && currentRoom?.RoomType == TypeOfRoom.Double; 
 
             var isExtraBedAllowed = false;
 
@@ -279,7 +260,6 @@ namespace HotellApp.Controllers.RoomController
             AmountOfExtraBedsAllowedInRoom amountOfExtraBeds = AmountOfExtraBedsAllowedInRoom.None;
             if (isExtraBedAllowed)
             {
-                // Kontrollera om rummet är tillräckligt stort för att rymma två extrasängar
                 if (roomSize >= 15 && roomSize <= 30)
                 {
                     amountOfExtraBeds = AnsiConsole.Prompt(
@@ -304,7 +284,6 @@ namespace HotellApp.Controllers.RoomController
 
             AnsiConsole.MarkupLine($"[yellow]Nuvarande pris per natt: {currentRoom.PricePerNight} kr[/]");
 
-            // Be om det nya priset och validera det
             decimal pricePerNight = AnsiConsole.Prompt(
                 new TextPrompt<decimal>("Ange det nya priset per natt för rummet:")
                     .Validate(value =>

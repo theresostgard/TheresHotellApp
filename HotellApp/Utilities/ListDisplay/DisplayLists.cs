@@ -60,7 +60,7 @@ namespace HotellApp.Utilities.ListDisplay
             foreach (var room in readAllRooms)
             {
 
-                string roomIdWithColor = $"[green]{room.RoomId}[/]";  // Grön färg för RumsId
+                string roomIdWithColor = $"[green]{room.RoomId}[/]"; 
                 string roomTypeWithColor = room.RoomType == TypeOfRoom.Single ? "[blue]Single[/]" : "[yellow]Double[/]";
                 string roomStatusWithColor = room.Status == StatusOfRoom.Active ? "[green]Active[/]" :
                                              room.Status == StatusOfRoom.InActive ? "[red]InActive[/]" :
@@ -72,11 +72,10 @@ namespace HotellApp.Utilities.ListDisplay
             }
             AnsiConsole.Write(
                   new Panel(table)
-                      .BorderColor(Color.Green) // Färg på ramen
-                      .Header($" Rumsinformation ") // Lägg till header
+                      .BorderColor(Color.Green) 
+                      .Header($" Rumsinformation ") 
                       .Border(BoxBorder.Double)
-                      );// dubbel ram
-            //AnsiConsole.Render(table);
+                      );
         }
 
         public void DisplayBookings()
@@ -102,9 +101,6 @@ namespace HotellApp.Utilities.ListDisplay
 
         }
 
-        public void DisplayInvoices()
-        {
-
-        }
+      
     }
 }

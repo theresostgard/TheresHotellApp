@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HotellApp.Services.BookingCreationService
+namespace HotellApp.Controllers.MenuServices.BookingMenues
 {
-    internal class BookingCreation
+    public interface IBookingMenu
     {
+        void ShowBookingOptions();
     }
 }

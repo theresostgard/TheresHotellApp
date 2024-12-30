@@ -67,12 +67,10 @@ namespace HotellApp.Controllers.BookingController
                 var departureDate = _bookingCreationController.GetValidDepartureDate(arrivalDate);
                 var (roomType, amountOfGuests, amountOfRooms, amountOfExtraBeds) = _bookingCreationController.GetRoomDetails();
 
-                // Steg 3: Kontrollera tillgängliga rum
                 var availableRooms = _bookingCreationController.CheckRoomAvailability(roomType, arrivalDate, departureDate, amountOfGuests);
 
-                if (availableRooms == null) return;  // Om det inte finns tillräckligt med tillgängliga rum
+                if (availableRooms == null) return; 
 
-                // Steg 4: Filtrera rummen (om det behövs extrasäng)
                 availableRooms = _bookingCreationController.FilterRoomsForExtraBeds(availableRooms, roomType == TypeOfRoom.Double);
 
                 if (availableRooms.Count < amountOfRooms)
@@ -81,11 +79,9 @@ namespace HotellApp.Controllers.BookingController
                     return;
                 }
 
-                // Steg 5: Visa tillgängliga rum
                 AnsiConsole.MarkupLine("[green]Tillgängliga rum att välja mellan[/]\n");
                 _bookingCreationController.ShowAvailableRooms(availableRooms);
 
-                // Steg 6: Låt användaren välja rum
                 List<Room> selectedRooms = new List<Room>();
                 bool isValidSelection = false;
 
@@ -93,7 +89,7 @@ namespace HotellApp.Controllers.BookingController
                 {
                     selectedRooms = _bookingCreationController.SelectRooms(availableRooms, amountOfRooms);
 
-                    // Kontrollera om användaren har valt rätt antal rum
+
                     if (selectedRooms.Count == amountOfRooms)
                     {
                         isValidSelection = true;
@@ -104,8 +100,6 @@ namespace HotellApp.Controllers.BookingController
                     }
                 }
 
-
-                // Steg 7: Skapa bokning
                 var booking = _bookingCreationController.CreateBooking(
                     guestId.Value,
                     arrivalDate,
@@ -114,7 +108,6 @@ namespace HotellApp.Controllers.BookingController
                     amountOfGuests,
                     selectedRooms.Count);
 
-                // Steg 8: Koppla rummen till bokningen och uppdatera rumsstatus
                 _bookingCreationController.AssignRoomsToBooking(
                     selectedRooms,
                     booking,
@@ -129,7 +122,7 @@ namespace HotellApp.Controllers.BookingController
         public void ReadAllBookingsController()
         {
 
-            var bookings = _bookingService.GetAllBookings(); // Hämtar alla bokningar
+            var bookings = _bookingService.GetAllBookings(); 
 
             if (bookings == null || !bookings.Any())
             {
@@ -137,7 +130,7 @@ namespace HotellApp.Controllers.BookingController
                 return;
             }
 
-            _displayBooking.Pagination(bookings); // Hantera visning och paginering
+            _displayBooking.Pagination(bookings); 
         }
 
 
@@ -175,7 +168,7 @@ namespace HotellApp.Controllers.BookingController
 
                 if (continueOption == "Nej")
                 {
-                    IsContinuingReading = false;  // Stäng av loopen om användaren inte vill fortsätta
+                    IsContinuingReading = false; 
                 }
             }
         }
@@ -197,7 +190,6 @@ namespace HotellApp.Controllers.BookingController
                 }
                 else
                 {
-                    // Kontrollera om bokningen har inträffat eller om det är ett framtida datum
                     if (currentBooking.ArrivalDate < DateTime.Now.Date)
                     {
                         Console.Clear();
@@ -231,34 +223,30 @@ namespace HotellApp.Controllers.BookingController
 
             AnsiConsole.MarkupLine("[gray]För att behålla det aktuella värdet, tryck bara på Enter.[/]");
 
-            // Hämta och validera ankomstdatum
             var arrivalDate = AnsiConsole.Prompt(
                 new TextPrompt<DateTime>($"Ange nytt ankomstdatum (yyyy-MM-dd):")
                     .ValidationErrorMessage("[red]Ogiltigt datum. Datumet måste vara från idag eller senare.[/]")
                     .Validate(date => date >= DateTime.Today ? ValidationResult.Success() : ValidationResult.Error(
                         "[red]Ankomstdatum måste vara idag eller senare![/]")));
 
-            // Hämta och validera avresedatum
             var departureDate = AnsiConsole.Prompt(
                 new TextPrompt<DateTime>($"Ange nytt avresedatum (yyyy-MM-dd):")
                     .ValidationErrorMessage("[red]Ogiltigt datum. Avresedatum måste vara efter ankomstdatum.[/]")
                     .Validate(date => date > arrivalDate ? ValidationResult.Success() : ValidationResult.Error(
                         "[red]Avresedatum måste vara efter ankomstdatum![/]")));
 
-            // Hämta och uppdatera rumstyp
+
             var roomType = AnsiConsole.Prompt(
                 new SelectionPrompt<TypeOfRoom>()
                     .Title($"Välj ny rumstyp:")
                     .AddChoices(TypeOfRoom.Single, TypeOfRoom.Double));
 
-            // Hämta och validera antal gäster
             var amountOfGuests = AnsiConsole.Prompt(
                 new TextPrompt<sbyte>($"Ange nytt antal gäster:")
                     .ValidationErrorMessage("[red]Antalet gäster måste vara minst 1![/]")
                     .Validate(guests => guests > 0 ? ValidationResult.Success() : ValidationResult.Error(
                         "[red]Antalet gäster måste vara större än 0![/]")));
 
-            // Hämta och validera antal rum
             var amountOfRooms = AnsiConsole.Prompt(
                 new TextPrompt<sbyte>($"Ange nytt antal rum:")
                     .ValidationErrorMessage("[red]Antalet rum måste vara minst 1![/]")
@@ -274,7 +262,7 @@ namespace HotellApp.Controllers.BookingController
                 amountOfRooms);
 
             Console.ReadKey();
-            // Returnera uppdaterad bokning
+
             return new Booking
             {
                 BookingId = currentBooking.BookingId,
@@ -288,7 +276,6 @@ namespace HotellApp.Controllers.BookingController
 
         public void DeleteBookingController()
         {
-            //visa lista med bokningar och datum så man vet vad man kan välja 
             _displayLists.DisplayBookings();
             var id = AnsiConsole.Ask<int>("Ange bokningsnummer för den bokning du vill radera:");
 
@@ -300,14 +287,11 @@ namespace HotellApp.Controllers.BookingController
                 return;
             }
 
-            // Kalla på servicen för att försöka ta bort bokningen
             var result = _bookingService.DeleteBooking(id);
 
-            // Visa resultatet till användaren
             AnsiConsole.MarkupLine($"[yellow]{result}[/]");
             Console.ReadKey();
         }
-
 
     }
 }

@@ -42,8 +42,8 @@ namespace HotellApp.Services.BookingServices
 
         public void AddRoomsToBooking(List<BookingRoom> bookingRooms)
         {
-            _dbContext.BookingRoom.AddRange(bookingRooms); // Lägger till alla BookingRoom-poster
-            _dbContext.SaveChanges(); // Spara ändringarna i databasen
+            _dbContext.BookingRoom.AddRange(bookingRooms); 
+            _dbContext.SaveChanges(); 
         }
 
 
@@ -51,7 +51,7 @@ namespace HotellApp.Services.BookingServices
         {
             var booking = _dbContext.Booking
             .Include(b => b.BookingRooms)
-            .ThenInclude(br => br.Room)  // Inkludera rummen som är kopplade till bokningen
+            .ThenInclude(br => br.Room)  
             .Include(g => g.Guest)
             .FirstOrDefault(b => b.BookingId == bookingId);
 
@@ -111,7 +111,7 @@ namespace HotellApp.Services.BookingServices
         }
         public bool TryGetAvailableRoomsForBooking(TypeOfRoom roomType, DateTime arrivalDate, DateTime departureDate, int amountOfRooms, out List<Room> availableRooms)
         {
-            // Hämta tillgängliga rum baserat på rumstyp och datumintervall
+       
             availableRooms = _dbContext.Room
                 .Where(r => r.RoomType == roomType && r.Status == StatusOfRoom.Active)
                 .ToList();
@@ -122,18 +122,27 @@ namespace HotellApp.Services.BookingServices
                    (departureDate >= br.Booking.ArrivalDate && departureDate <= br.Booking.DepartureDate))))
             .ToList();
 
-            // Om användaren valde extrasängar för dubbelrum
+
             if (roomType == TypeOfRoom.Double)
             {
-                
-                // Kontrollera om det finns rum med tillräckligt utrymme för extrasängar
-                availableRooms = availableRooms.Where(r => r.RoomSize >= 15 && r.RoomSize < 35).ToList();
+                availableRooms = availableRooms.Where(r => r.RoomSize >= 15).ToList(); 
+
+
+                foreach (var room in availableRooms)
+                {
+                    if (room.RoomSize < 30)
+                    {
+                        room.AmountOfExtraBeds = Models.Enums.AmountOfExtraBedsAllowedInRoom.One; 
+                    }
+                    else
+                    {
+                        room.AmountOfExtraBeds = Models.Enums.AmountOfExtraBedsAllowedInRoom.Two;  
+                    }
+                }
             }
 
-            // Om det inte finns tillräckligt med rum returnera false
             return availableRooms.Count >= amountOfRooms;
         }
-
        
     }
 }

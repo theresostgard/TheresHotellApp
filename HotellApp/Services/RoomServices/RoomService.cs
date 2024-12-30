@@ -77,7 +77,6 @@ namespace HotellApp.Services.RoomServices
 
             if (room != null)
             {
-                // Uppdatera statusen på rummet istället för att ta bort det
                 room.Status = newStatus;
                 _dbContext.SaveChanges();
                 return true;
@@ -92,7 +91,6 @@ namespace HotellApp.Services.RoomServices
 
         private bool HasUpcomingBookings(int roomId)
         {
-            // Kontrollera om rummet har bokningar de kommande 3 månaderna
             var bookings = _dbContext.BookingRoom
                 .Include(br => br.Booking)
                 .Where(br => br.RoomId == roomId &&
@@ -102,7 +100,6 @@ namespace HotellApp.Services.RoomServices
 
             Console.WriteLine($"Antal bokningar hittade för rummet: {bookings.Count}");
 
-            // Returnera true om det finns bokningar, annars false
             return bookings.Count > 0;
         }
 
@@ -134,12 +131,10 @@ namespace HotellApp.Services.RoomServices
 
         public List<Room> GetAvailableRooms(TypeOfRoom roomType, DateTime arrivalDate, DateTime departureDate, sbyte amountOfRooms)
         {
-            // Hitta alla rum av den angivna typen
             var allRooms = _dbContext.Room
                 .Where(r => r.RoomType == roomType)
                 .ToList();
 
-            // Hitta rummen som är tillgängliga för det angivna datumintervallet
             var availableRooms = allRooms.Where(room =>
             {
                 var roomStatuses = _dbContext.RoomStatusHistory
@@ -148,8 +143,6 @@ namespace HotellApp.Services.RoomServices
                                   (rsh.EndDate == null || rsh.EndDate > arrivalDate))
                     .ToList();
 
-                // Här kollar vi om rummet är tillgängligt. Om det inte finns någon status för rummet som blockerar det,
-                // ska det vara tillgängligt.
                 return !roomStatuses.Any();
             }).ToList();
 

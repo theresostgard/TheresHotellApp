@@ -22,7 +22,7 @@ namespace HotellApp.Utilities.BookingDisplay
  
         public void Pagination(List<Booking> bookings)
         {
-            var pageSize = 2; // Antal bokningar per sida
+            var pageSize = 2;
             var totalPages = (int)Math.Ceiling(bookings.Count / (double)pageSize);
             var currentPage = 1;
 
@@ -52,7 +52,7 @@ namespace HotellApp.Utilities.BookingDisplay
                     }
                     else
                     {
-                        currentPage = 1; // Börja om på första sidan
+                        currentPage = 1; 
                     }
                 }
                 else if (key == ConsoleKey.LeftArrow && currentPage > 1)
@@ -61,7 +61,7 @@ namespace HotellApp.Utilities.BookingDisplay
                 }
                 else if (key == ConsoleKey.Escape)
                 {
-                    break; // Avsluta programmet
+                    break; 
                 }
             }
         }

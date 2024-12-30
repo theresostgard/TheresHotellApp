@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HotellApp.Services.MenuServices
+namespace HotellApp.Controllers.MenuControllers
 {
     public interface IMenuService
     {

@@ -4,7 +4,6 @@
     {
         void DisplayBookings();
         void DisplayGuests();
-        void DisplayInvoices();
         void DisplayRooms();
     }
 }
