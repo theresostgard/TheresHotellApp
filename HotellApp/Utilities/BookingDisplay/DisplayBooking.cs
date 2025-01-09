@@ -115,7 +115,7 @@ namespace HotellApp.Utilities.BookingDisplay
             table.AddRow("[yellow]Antal gäster[/]", booking.AmountOfGuests.ToString());
             table.AddRow("[yellow]Antal rum[/]", booking.AmountOfRooms.ToString());
             table.AddRow("[yellow]Status på bokningen[/]", booking.Status.ToString());
-
+           
             return table;
         }
 

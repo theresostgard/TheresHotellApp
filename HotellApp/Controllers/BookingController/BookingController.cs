@@ -41,10 +41,6 @@ namespace HotellApp.Controllers.BookingController
 
         public void CreateBookingController()
         {
-            bool continueBooking = true;
-
-            while (continueBooking)
-            {
                 Console.Clear();
                 int? guestId = null;
                 while (guestId == null)
@@ -115,8 +111,7 @@ namespace HotellApp.Controllers.BookingController
                     departureDate);
 
                 AnsiConsole.WriteLine($"Ny bokning skapad med bokningsnr {booking.BookingId}.");
-                continueBooking = AnsiConsole.Confirm("Vill du skapa en till bokning?");
-            }
+           
         }
 
         public void ReadAllBookingsController()

@@ -20,7 +20,7 @@ namespace HotellApp
         {
             Console.Title = "TheresHotell";
 
-            StartScreen.Print();
+            //StartScreen.Print();
 
             var builder = new ConfigurationBuilder()
                 .AddJsonFile($"appsettings.json", true, true);
